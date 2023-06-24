@@ -4,7 +4,6 @@ import { Avatar, HStack, VStack } from 'native-base'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserData } from '../../database/authenticate';
 import { CommonActions } from '@react-navigation/native';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const UserTabScreen = ({ navigation }) => {
     const [role, setRole] = useState('');
@@ -25,7 +24,6 @@ const UserTabScreen = ({ navigation }) => {
             try {
                 const storedRole = await AsyncStorage.getItem('role');
                 const userId = await AsyncStorage.getItem('userId');
-                console.log(userId);
                 if (storedRole !== null) {
                     setRole(storedRole);
                 }
@@ -56,8 +54,14 @@ const UserTabScreen = ({ navigation }) => {
         navigation.navigate('Your Wallet');
     }
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         // Reset the navigation stack and navigate to the "Get Started" screen
+        try {
+            await AsyncStorage.removeItem('role');
+            await AsyncStorage.removeItem('userId');
+        } catch (error) {
+            console.log('Error deleting item:', error);
+        }
         navigation.dispatch(
             CommonActions.reset({
                 index: 0,
@@ -90,9 +94,9 @@ const UserTabScreen = ({ navigation }) => {
                     <View style={{ padding: 10, marginLeft: 20, justifyContent: 'center', }} >
                         <Text style={{ fontSize: 20, fontWeight: "bold", color: "blue" }} >{data ? data.firstName + " " + data.lastName : 'Your Name'}</Text>
                         <View style={{
-                            flexDirection:'row',
-                            flexWrap:'wrap',
-                            width:'95%'
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            width: '95%'
                         }}>
                             {
                                 role === 'Seller' && (

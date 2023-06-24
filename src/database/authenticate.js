@@ -61,7 +61,7 @@ export const resendVerificationEmail = () => {
   }
 };
 
-export const Signin = async (email, password) => {
+export const Signin = async (email, password, callback) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const userId = userCredential.user.uid;
@@ -77,18 +77,19 @@ export const Signin = async (email, password) => {
       const userData = docSnap.data();
       const isProfileCompleted = !!(userData.firstName && userData.lastName /* Add other required fields here */);
 
-      return { userRole, isProfileCompleted };
+      callback({ userRole, isProfileCompleted }, null);
     } else {
-      ToastAndroid.show('User document not found!', ToastAndroid.LONG);
-      return null;
+      const errorMessage = 'User document not found!';
+      ToastAndroid.show(errorMessage, ToastAndroid.LONG);
+      callback(null, errorMessage);
     }
   } catch (error) {
-    const errorMessage = error.message;
-    ToastAndroid.show(errorMessage.slice(16, 50), ToastAndroid.LONG);
-    console.log(errorMessage);
-    return null;
+    const errorMessage = error.message.slice(16, 50);
+    ToastAndroid.show(errorMessage, ToastAndroid.LONG);
+    callback(null, errorMessage);
   }
 };
+
 
 
 export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {

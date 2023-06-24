@@ -17,84 +17,81 @@ import {
   resendVerificationEmail,
 } from '../../../database/authenticate';
 import { CommonActions } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SigninScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showIndicator, setShowIndicator] = useState(false);
   const [showButton, setShowButton] = useState(false);
-  const [isVerified, setVerified] = useState(false);
-
-  const checkEmail = async () => {
-    try {
-      checkEmailVerificationStatus((isEmailVerified) => {
-        console.log(isEmailVerified);
-        setVerified(isEmailVerified);
-      });
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
 
   const handleResendVerification = () => {
     resendVerificationEmail();
   };
 
-  useEffect(() => {
-    checkEmail();
-  }, [])
-
   const handleSignIn = async () => {
     try {
       if (email && password) {
         setShowIndicator(true); // Show the activity indicator
-        const { userRole, isProfileCompleted } = await Signin(email, password);
-        console.log(userRole, isProfileCompleted);
-        await checkEmailVerificationStatus((isEmailVerified) => {
-          if (isEmailVerified) {
-            console.log(userRole);
-            if (userRole === 'Buyer' && isProfileCompleted) {
-              setEmail('');
-              setPassword('');
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: 'Welcome Customer' }],
-                })
-              );
-            } else if (userRole === 'Seller' && isProfileCompleted) {
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: 'Skill Finder' }],
-                })
-              );
-            } else if (userRole === 'Buyer' && !isProfileCompleted) {
-              ToastAndroid.show(
-                'Complete your profile and sign in',
-                ToastAndroid.SHORT
-              );
-              navigation.navigate('Buyer Account', { editing: false });
-            } else if (userRole === 'Seller' && !isProfileCompleted) {
-              ToastAndroid.show(
-                'Complete your profile and sign in',
-                ToastAndroid.SHORT
-              );
-              navigation.navigate('Register Alert', { editing: false, email: email });
-            } else {
-              console.log("Error in sign in screen");
-            }
-            setShowIndicator(false); // Hide the activity indicator 
-          } else {
-            setShowIndicator(false); // Hide the activity indicator
-            ToastAndroid.show(
-              'Please verify your email address from your email inbox',
-              ToastAndroid.LONG
-            );
-            setShowButton(true);
+
+        // Sign in with email and password
+        await Signin(email, password, async (data, error) => {
+
+          if (error) {
+            console.log(error);
+            return;
           }
+
+          const { userRole, isProfileCompleted } = data;
+
+          // Check email verification status with callback
+          checkEmailVerificationStatus((isEmailVerified) => {
+            setShowIndicator(false); // Hide the activity indicator
+            if (isEmailVerified) {
+              if (userRole === 'Buyer') {
+                if (isProfileCompleted) {
+                  setEmail('');
+                  setPassword('');
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{ name: 'Welcome Customer' }],
+                    })
+                  );
+                } else {
+                  ToastAndroid.show(
+                    'Complete your profile and sign in',
+                    ToastAndroid.SHORT
+                  );
+                  navigation.navigate('Buyer Account', { editing: false });
+                }
+              } else if (userRole === 'Seller') {
+                if (isProfileCompleted) {
+                  setEmail('');
+                  setPassword('');
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{ name: 'Skill Finder' }],
+                    })
+                  );
+                } else {
+                  ToastAndroid.show(
+                    'Complete your profile and sign in',
+                    ToastAndroid.SHORT
+                  );
+                  navigation.navigate('Register Alert', { editing: false, email: email });
+                }
+              } else {
+                console.log("Error in sign in screen");
+              }
+            } else {
+              ToastAndroid.show(
+                'Please verify your email address from your email inbox',
+                ToastAndroid.LONG
+              );
+              setShowButton(true);
+            }
+          });
         });
       } else {
         ToastAndroid.show('Provide Credentials Please', ToastAndroid.LONG);
@@ -104,6 +101,9 @@ const SigninScreen = ({ navigation }) => {
       setShowIndicator(false); // Hide the activity indicator in case of an error
     }
   };
+
+
+
 
 
   const { height } = useWindowDimensions();
