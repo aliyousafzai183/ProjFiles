@@ -169,16 +169,17 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
         "user",
         profileImage
       );
-      ToastAndroid.show('Account Details Saved!', ToastAndroid.SHORT);
       if (editing) {
+        ToastAndroid.show('Account Details Updated!', ToastAndroid.SHORT);
         navigation.goBack();
       } else {
+        ToastAndroid.show('Account Details Saved! Login Now!', ToastAndroid.SHORT);
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
             routes: [{ name: 'Sign In' }],
           })
-        );        
+        );
       }
     } else {
       console.log('userId not found');

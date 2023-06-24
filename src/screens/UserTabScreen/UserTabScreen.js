@@ -87,19 +87,25 @@ const UserTabScreen = ({ navigation }) => {
                     }}>
                         RB
                     </Avatar>
-                    <View style={{ padding: 10, marginLeft: 20, justifyContent:'center', }} >
+                    <View style={{ padding: 10, marginLeft: 20, justifyContent: 'center', }} >
                         <Text style={{ fontSize: 20, fontWeight: "bold", color: "blue" }} >{data ? data.firstName + " " + data.lastName : 'Your Name'}</Text>
-                        {
-                            role === 'Seller' && (
-                                <Text style={{ fontSize: 16 }} >
-                                    {
-                                        data.skills?.map((item) => {
-                                            return item + "  ";
-                                        })
-                                    }
-                                </Text>
-                            )
-                        }
+                        <View style={{
+                            flexDirection:'row',
+                            flexWrap:'wrap',
+                            width:'95%'
+                        }}>
+                            {
+                                role === 'Seller' && (
+                                    <Text style={{ fontSize: 16 }} >
+                                        {
+                                            data.skills?.map((item) => {
+                                                return item + "  ";
+                                            })
+                                        }
+                                    </Text>
+                                )
+                            }
+                        </View>
                     </View>
                 </HStack>
                 <TouchableOpacity

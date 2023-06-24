@@ -6,27 +6,28 @@ import { doc, setDoc, getDoc, onSnapshot, collection, where, query } from 'fireb
 
 const auth = getAuth();
 
-export const Signup = async (email, password, userRole, callback) => {
+export const Signup = async (email, password, userRole) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     const userId = user.uid;
     await AsyncStorage.setItem('userId', userId);
 
-    // Add userRole directly in the createUserWithEmailAndPassword callback
     await setDoc(doc(db, 'users', userId), {
       role: userRole
     });
 
     await sendEmailVerification(user);
     ToastAndroid.show('Complete your profile to Sign Up! Verification email sent.', ToastAndroid.SHORT);
-    callback(userId);
+
+    return userId;
   } catch (error) {
     const errorMessage = error.message;
     ToastAndroid.show(errorMessage, ToastAndroid.LONG);
-    callback(null);
+    return null;
   }
 };
+
 
 // function to handle email verification status
 // function to handle email verification status

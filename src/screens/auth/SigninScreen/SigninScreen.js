@@ -54,6 +54,7 @@ const SigninScreen = ({ navigation }) => {
         console.log(userRole, isProfileCompleted);
         await checkEmailVerificationStatus((isEmailVerified) => {
           if (isEmailVerified) {
+            console.log(userRole);
             if (userRole === 'Buyer' && isProfileCompleted) {
               setEmail('');
               setPassword('');

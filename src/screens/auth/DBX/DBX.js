@@ -70,7 +70,7 @@ const DBX = ({ navigation, route }) => {
       // Update the skills based on the selected category
       const selectedSkills = categorySkillsMap[cat] || [];
       // if (skills.length === 0) {
-        setSkills(selectedSkills);
+      setSkills(selectedSkills);
       // }
     };
 
@@ -256,16 +256,18 @@ const DBX = ({ navigation, route }) => {
         cat,
         profileImage
       );
-      ToastAndroid.show('Account Details Saved!', ToastAndroid.LONG);
       if (editing) {
+        ToastAndroid.show('Account Details Updated!', ToastAndroid.LONG);
         navigation.goBack();
+      } else if (!editing) {
+        ToastAndroid.show('Account Details Saved! Login Now!', ToastAndroid.LONG);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Sign In' }], // Replace 'NewScreen' with the screen you want to navigate to
+          })
+        );
       }
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'Sign In' }], // Replace 'NewScreen' with the screen you want to navigate to
-        })
-      );
     } else {
       console.log('userId not found');
     }
