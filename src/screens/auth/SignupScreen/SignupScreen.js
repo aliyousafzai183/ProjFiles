@@ -13,6 +13,7 @@ const SignupScreen = ({ navigation, route }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordRepeat, setPasswordRepeat] = useState('');
+    const [role, setUserRole] = useState(isClient? "Buyer" : "Seller");
 
     const handlePress = () => {
         // Email validation regex
@@ -26,8 +27,9 @@ const SignupScreen = ({ navigation, route }) => {
             return;
           }
       
-          Signup(email, password, (userId) => {
+          Signup(email, password, role , (userId) => {
             if (userId && isClient) {
+              console.log(userId);
               AsyncStorage.setItem('role', 'Buyer');
               navigation.navigate('Buyer Account', { editing: false });
             } else if (userId && !isClient) {

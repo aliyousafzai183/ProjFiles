@@ -256,7 +256,7 @@ const DBX = ({ navigation, route }) => {
         cat,
         profileImage
       );
-      ToastAndroid.show('Account Details Saved! Verify your email NOW', ToastAndroid.LONG);
+      ToastAndroid.show('Account Details Saved!', ToastAndroid.LONG);
       if (editing) {
         navigation.goBack();
       }

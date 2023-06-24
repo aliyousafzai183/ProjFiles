@@ -50,11 +50,11 @@ const SigninScreen = ({ navigation }) => {
     try {
       if (email && password) {
         setShowIndicator(true); // Show the activity indicator
-        const userRole = await Signin(email, password);
-        console.log(role);
+        const { userRole, isProfileCompleted } = await Signin(email, password);
+        console.log(userRole, isProfileCompleted);
         await checkEmailVerificationStatus((isEmailVerified) => {
           if (isEmailVerified) {
-            if (userRole === 'Buyer') {
+            if (userRole === 'Buyer' && isProfileCompleted) {
               setEmail('');
               setPassword('');
               navigation.dispatch(
@@ -63,15 +63,27 @@ const SigninScreen = ({ navigation }) => {
                   routes: [{ name: 'Welcome Customer' }],
                 })
               );
-            } else if (userRole === 'Seller') {
+            } else if (userRole === 'Seller' && isProfileCompleted) {
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
                   routes: [{ name: 'Skill Finder' }],
                 })
               );
+            } else if (userRole === 'Buyer' && !isProfileCompleted) {
+              ToastAndroid.show(
+                'Complete your profile and sign in',
+                ToastAndroid.SHORT
+              );
+              navigation.navigate('Buyer Account', { editing: false });
+            } else if (userRole === 'Seller' && !isProfileCompleted) {
+              ToastAndroid.show(
+                'Complete your profile and sign in',
+                ToastAndroid.SHORT
+              );
+              navigation.navigate('Register Alert', { editing: false, email: email });
             } else {
-              console.log('Invalid user role');
+              console.log("Error in sign in screen");
             }
             setShowIndicator(false); // Hide the activity indicator 
           } else {

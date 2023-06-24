@@ -6,35 +6,21 @@ import { doc, setDoc, getDoc, onSnapshot, collection, where, query } from 'fireb
 
 const auth = getAuth();
 
-const Signup = async (email, password, callback) => {
+export const Signup = async (email, password, userRole, callback) => {
   try {
-    await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        const userId = user.uid;
-        AsyncStorage.setItem('userId', userId)
-          .then(() => {
-            // Send email verification
-            sendEmailVerification(auth.currentUser)
-              .then(() => {
-                ToastAndroid.show('Complete your profile to Sign Up! Verification email sent.', ToastAndroid.SHORT);
-                callback(userId); 
-              })
-              .catch((error) => {
-                console.log(error);
-                callback(null);
-              });
-          })
-          .catch((error) => {
-            console.log(error);
-            callback(null);
-          });
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        ToastAndroid.show(errorMessage, ToastAndroid.LONG);
-        callback(null);
-      });
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    const userId = user.uid;
+    await AsyncStorage.setItem('userId', userId);
+
+    // Add userRole directly in the createUserWithEmailAndPassword callback
+    await setDoc(doc(db, 'users', userId), {
+      role: userRole
+    });
+
+    await sendEmailVerification(user);
+    ToastAndroid.show('Complete your profile to Sign Up! Verification email sent.', ToastAndroid.SHORT);
+    callback(userId);
   } catch (error) {
     const errorMessage = error.message;
     ToastAndroid.show(errorMessage, ToastAndroid.LONG);
@@ -74,7 +60,7 @@ export const resendVerificationEmail = () => {
   }
 };
 
-const Signin = async (email, password) => {
+export const Signin = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const userId = userCredential.user.uid;
@@ -85,7 +71,12 @@ const Signin = async (email, password) => {
     if (docSnap.exists()) {
       const userRole = docSnap.data().role;
       await AsyncStorage.setItem('role', userRole);
-      return userRole;
+
+      // Check if the required profile fields are present
+      const userData = docSnap.data();
+      const isProfileCompleted = !!(userData.firstName && userData.lastName /* Add other required fields here */);
+
+      return { userRole, isProfileCompleted };
     } else {
       ToastAndroid.show('User document not found!', ToastAndroid.LONG);
       return null;
@@ -97,6 +88,7 @@ const Signin = async (email, password) => {
     return null;
   }
 };
+
 
 export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {
   try {
@@ -238,8 +230,3 @@ export const ForgotPassword = async (email) => {
 
     });
 };
-
-
-
-
-export { Signup, Signin };

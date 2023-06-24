@@ -169,7 +169,7 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
         "user",
         profileImage
       );
-      ToastAndroid.show('Account Details Saved! Verify your email NOW!', ToastAndroid.SHORT);
+      ToastAndroid.show('Account Details Saved!', ToastAndroid.SHORT);
       if (editing) {
         navigation.goBack();
       } else {
