@@ -87,9 +87,10 @@ const PostJobScreen = ({ navigation, route }) => {
       return;
     }
 
-    // Check if duration contains both integer and string values
-    if (!duration) {
-      ToastAndroid.show('Please enter a valid duration (e.g., 1 week)', ToastAndroid.SHORT);
+    // Check if duration is a valid format
+    const durationRegex = /^\d+ (day|days|week|weeks|month|months|year|years)$/i;
+    if (!durationRegex.test(duration)) {
+      ToastAndroid.show('Please enter a valid duration (e.g., 1 week 2 days, 3 months, 4 years)', ToastAndroid.SHORT);
       return;
     }
 
@@ -222,40 +223,15 @@ const PostJobScreen = ({ navigation, route }) => {
           keyboardType='numeric'
         />
 
-        {/* {
-          !jobId ?
-            <View style={styles.durationWrapper}> */}
-              <TextInput
-                left={<TextInput.Icon name="clipboard-text-clock" />}
-                mode="flat"
-                disabled={jobId}
-                style={styles.inputDuration}
-                placeholder="Contract Duration"
-                value={duration}
-                onChangeText={setDuration}
-              />
-              {/* <DropDown
-                label={"Hours/Days"}
-                mode={"outlined"}
-                visible={showDropDown}
-                showDropDown={() => setShowDropDown(true)}
-                onDismiss={() => setShowDropDown(false)}
-                value={cat}
-                setValue={setCat}
-                list={CatList}
-              />
-            </View>
-            :
-            <TextInput
-              disabled={jobId}
-              left={<TextInput.Icon name="card-account-mail" />}
-              mode="flat"
-              style={[styles.input, { marginTop: 10 }]}
-              placeholder="Category"
-              value={cat}
-              onChangeText={setCat}
-            />
-        } */}
+        <TextInput
+          left={<TextInput.Icon name="clipboard-text-clock" />}
+          mode="flat"
+          disabled={jobId}
+          style={styles.input}
+          placeholder="Contract Duration"
+          value={duration}
+          onChangeText={setDuration}
+        />
 
         {
           !jobId && (
@@ -266,11 +242,11 @@ const PostJobScreen = ({ navigation, route }) => {
         }
 
 
-        {jobId && (
+        {/* {jobId && (
           <TouchableOpacity style={styles.button1} onPress={() => { handleDeleteJob(jobId) }}>
             <Text style={styles.buttonText}>Delete Job</Text>
           </TouchableOpacity>
-        )}
+        )} */}
 
         {
           jobId && (
@@ -307,18 +283,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 2,
     marginBottom: 10,
-  },
-  inputDuration: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 2,
-    marginBottom: 10,
-  },
-  durationWrapper: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
   },
   button: {
     justifyContent: 'center',

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Button, ScrollView, TouchableOpacity, Alert, BackHandler, ToastAndroid, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Image, Button, ScrollView, TouchableOpacity, Alert, BackHandler, ToastAndroid, ActivityIndicator, Linking } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,6 +9,8 @@ import { CommonActions } from '@react-navigation/native';
 import DropDown from "react-native-paper-dropdown";
 import { db } from '../../../database/config';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import * as Location from 'expo-location';
+import * as IntentLauncher from 'expo-intent-launcher';
 
 const DBX = ({ navigation, route }) => {
   const { editing } = route.params;
@@ -88,8 +90,10 @@ const DBX = ({ navigation, route }) => {
             setLastName(data.lastName || '');
             // setEmail(data.email || '');
             setContact(data.contact || '');
-            setAddress(data.address || '');
-            setCountryCity(data.country || '');
+            if (editing) {
+              setAddress(data.address || '');
+              setCountryCity(data.country || '');
+            }
             setCnic(data.cnic || '');
             setAbout(data.about || '');
             setSkills(data.skills || []);
@@ -138,6 +142,53 @@ const DBX = ({ navigation, route }) => {
     return () => backHandler.remove();
   }, []);
 
+
+  const openAppSettings = () => {
+    Linking.openSettings();
+  };
+  
+  const getLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+  
+      if (status !== 'granted') {
+        console.log('Location permission is required to proceed');
+        const retry = await confirmRetry();
+        if (retry) {
+          openAppSettings();
+          return; // Return here to prevent further execution
+        }
+      }
+  
+      const location = await Location.getCurrentPositionAsync();
+      const { latitude, longitude } = location.coords;
+  
+      // Reverse geocoding
+      const addressData = await Location.reverseGeocodeAsync({ latitude, longitude });
+  
+      if (addressData.length > 0) {
+        const { city, country } = addressData[0];
+        setAddress(city);
+        setCountryCity(country);
+      }
+    } catch (error) {
+      console.error('Error getting location', error);
+    }
+  };
+  
+  const confirmRetry = () => {
+    return new Promise((resolve) => {
+      Alert.alert(
+        'Location Permission',
+        'Location permission is required to proceed. Do you want to open settings and grant permission?',
+        [
+          { text: 'Cancel', onPress: () => resolve(false), style: 'cancel' },
+          { text: 'OK', onPress: () => resolve(true) },
+        ],
+        { cancelable: false }
+      );
+    });
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -320,7 +371,7 @@ const DBX = ({ navigation, route }) => {
             setValue={setCat}
             list={CatList}
             inputProps={{
-              right: <TextInput.Icon name="menu-down" />,
+              right: <TextInput.Icon name="menu-down" />
             }}
           />
         </View>
@@ -363,24 +414,33 @@ const DBX = ({ navigation, route }) => {
             onChangeText={setContact}
             activeUnderlineColor="yellow"
           />
-          <TextInput
-            left={<TextInput.Icon name="map-marker" />}
-            mode="flat"
-            style={styles.input}
-            label="Address"
-            value={address}
-            onChangeText={setAddress}
-            activeUnderlineColor="yellow"
-          />
-          <TextInput
-            left={<TextInput.Icon name="home-city" />}
-            mode="flat"
-            style={styles.input}
-            label="Country/City"
-            value={countryCity}
-            onChangeText={setCountryCity}
-            activeUnderlineColor="yellow"
-          />
+
+          <TouchableOpacity
+            onPress={getLocation}
+            style={styles.adressWrapper}
+          >
+            <TextInput
+              left={<TextInput.Icon name="map-marker" />}
+              mode="flat"
+              style={styles.input}
+              label="City"
+              value={address}
+              onChangeText={setAddress}
+              activeUnderlineColor="yellow"
+              disabled={true}
+            />
+            <TextInput
+              disabled={true}
+              left={<TextInput.Icon name="home-city" />}
+              mode="flat"
+              style={styles.input}
+              label="Country"
+              value={countryCity}
+              onChangeText={setCountryCity}
+              activeUnderlineColor="yellow"
+            />
+          </TouchableOpacity>
+
           <TextInput
             left={<TextInput.Icon name="smart-card" />}
             mode="flat"
@@ -508,6 +568,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: '5%'
   },
+  adressWrapper: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 });
 
 export default DBX;
