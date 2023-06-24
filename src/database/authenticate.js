@@ -17,8 +17,8 @@ const Signup = async (email, password, callback) => {
             // Send email verification
             sendEmailVerification(auth.currentUser)
               .then(() => {
-                ToastAndroid.show('Signed up successfully! Verification email sent.', ToastAndroid.SHORT);
-                callback(userId);
+                ToastAndroid.show('Complete your profile to Sign Up! Verification email sent.', ToastAndroid.SHORT);
+                callback(userId); 
               })
               .catch((error) => {
                 console.log(error);
@@ -57,7 +57,6 @@ export const checkEmailVerificationStatus = (callback) => {
     }
   });
 };
-
 
 // Function to resend verification email
 export const resendVerificationEmail = () => {
@@ -98,7 +97,6 @@ const Signin = async (email, password) => {
     return null;
   }
 };
-
 
 export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {
   try {
@@ -159,7 +157,6 @@ export const getUserDataById = (userId, callback) => {
   return [unsubscribeById, unsubscribeByContact];
 };
 
-
 export const getUserData = (contact, callback) => {
   const usersCollectionRef = collection(db, 'users');
 
@@ -199,8 +196,6 @@ export const getUserData = (contact, callback) => {
   // Return the unsubscribe function for the contact query
   return unsubscribeContact;
 };
-
-
 
 export const getUsersByCategory = (category, callback) => {
   const usersRef = collection(db, 'users');

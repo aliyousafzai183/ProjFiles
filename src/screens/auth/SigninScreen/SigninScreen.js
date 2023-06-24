@@ -17,6 +17,7 @@ import {
   resendVerificationEmail,
 } from '../../../database/authenticate';
 import { CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SigninScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -50,6 +51,7 @@ const SigninScreen = ({ navigation }) => {
       if (email && password) {
         setShowIndicator(true); // Show the activity indicator
         const userRole = await Signin(email, password);
+        console.log(role);
         await checkEmailVerificationStatus((isEmailVerified) => {
           if (isEmailVerified) {
             if (userRole === 'Buyer') {
