@@ -75,49 +75,30 @@ export const resendVerificationEmail = () => {
   }
 };
 
-const Signin = async (email, password, callback) => {
+const Signin = async (email, password) => {
   try {
-    await signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const userId = userCredential.user.uid;
-        AsyncStorage.setItem('userId', userId)
-          .then(() => {
-            // Retrieve user document based on userId
-            const userRef = doc(db, 'users', userId);
-            getDoc(userRef)
-              .then((docSnap) => {
-                if (docSnap.exists()) {
-                  const userRole = docSnap.data().role;
-                  AsyncStorage.setItem('role', userRole);
-                  // ToastAndroid.show('Successfully signed In!', ToastAndroid.SHORT);
-                  callback(userRole);
-                } else {
-                  ToastAndroid.show('User document not found!', ToastAndroid.LONG);
-                  callback(null);
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-                callback(null);
-              });
-          })
-          .catch((error) => {
-            console.log(error);
-            callback(null);
-          });
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        ToastAndroid.show(errorMessage.slice(16, 50), ToastAndroid.LONG);
-        callback(null);
-      });
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userId = userCredential.user.uid;
+    await AsyncStorage.setItem('userId', userId);
+
+    const userRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      const userRole = docSnap.data().role;
+      await AsyncStorage.setItem('role', userRole);
+      return userRole;
+    } else {
+      ToastAndroid.show('User document not found!', ToastAndroid.LONG);
+      return null;
+    }
   } catch (error) {
     const errorMessage = error.message;
     ToastAndroid.show(errorMessage.slice(16, 50), ToastAndroid.LONG);
     console.log(errorMessage);
-    callback(null);
+    return null;
   }
 };
+
 
 export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {
   try {
