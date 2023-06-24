@@ -41,63 +41,54 @@ const SigninScreen = ({ navigation }) => {
     resendVerificationEmail();
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     checkEmail();
-  },[])
+  }, [])
 
-const handleSignIn = async () => {
-  try {
-    if (email && password) {
-      setShowIndicator(true); // Show the activity indicator
-      const userRole = await Signin(email, password);
-      if (userRole === 'Buyer') {
-        await checkEmail();
-        if (isVerified) {
-          setEmail('');
-          setPassword('');
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'Welcome Customer' }],
-            })
-          );
-        } else {
-          setShowIndicator(false); // Hide the activity indicator
-          ToastAndroid.show(
-            'Please verify your email address from your email inbox',
-            ToastAndroid.LONG
-          );
-          setShowButton(true);
-        }
-      } else if (userRole === 'Seller') {
-        await checkEmail();
-        if (isVerified) {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'Skill Finder' }],
-            })
-          );
-        } else {
-          setShowIndicator(false); // Hide the activity indicator
-          ToastAndroid.show(
-            'Please verify your email address from your email inbox',
-            ToastAndroid.LONG
-          );
-          setShowButton(true);
-        }
+  const handleSignIn = async () => {
+    try {
+      if (email && password) {
+        setShowIndicator(true); // Show the activity indicator
+        const userRole = await Signin(email, password);
+        await checkEmailVerificationStatus((isEmailVerified) => {
+          if (isEmailVerified) {
+            if (userRole === 'Buyer') {
+              setEmail('');
+              setPassword('');
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Welcome Customer' }],
+                })
+              );
+            } else if (userRole === 'Seller') {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Skill Finder' }],
+                })
+              );
+            } else {
+              console.log('Invalid user role');
+            }
+            setShowIndicator(false); // Hide the activity indicator 
+          } else {
+            setShowIndicator(false); // Hide the activity indicator
+            ToastAndroid.show(
+              'Please verify your email address from your email inbox',
+              ToastAndroid.LONG
+            );
+            setShowButton(true);
+          }
+        });
       } else {
-        console.log('Invalid user role');
+        ToastAndroid.show('Provide Credentials Please', ToastAndroid.LONG);
       }
-      setShowIndicator(false); // Hide the activity indicator
-    } else {
-      ToastAndroid.show('Provide Credentials Please', ToastAndroid.LONG);
+    } catch (error) {
+      console.log(error);
+      setShowIndicator(false); // Hide the activity indicator in case of an error
     }
-  } catch (error) {
-    console.log(error);
-    setShowIndicator(false); // Hide the activity indicator in case of an error
-  }
-};
+  };
 
 
   const { height } = useWindowDimensions();
