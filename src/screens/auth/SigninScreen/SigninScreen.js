@@ -41,11 +41,10 @@ const SigninScreen = ({ navigation }) => {
             return;
           }
 
-          const { userRole, isProfileCompleted } = data;
+          const { userRole, isProfileCompleted } = await data;
 
           // Check email verification status with callback
           checkEmailVerificationStatus((isEmailVerified) => {
-            setShowIndicator(false); // Hide the activity indicator
             if (isEmailVerified) {
               if (userRole === 'Buyer') {
                 if (isProfileCompleted) {
@@ -96,15 +95,15 @@ const SigninScreen = ({ navigation }) => {
       } else {
         ToastAndroid.show('Provide Credentials Please', ToastAndroid.LONG);
       }
+      
     } catch (error) {
       console.log(error);
       setShowIndicator(false); // Hide the activity indicator in case of an error
+    } finally{
+      setShowIndicator(false); // Hide the activity indicator
+
     }
   };
-
-
-
-
 
   const { height } = useWindowDimensions();
 

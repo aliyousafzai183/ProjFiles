@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, TouchableOpacity, StyleSheet, ScrollView, Button, Alert, BackHandler } from 'react-native';
+import { Text, View, Image, ActivityIndicator, StyleSheet, ScrollView, Button, Alert, BackHandler } from 'react-native';
 import { Box, VStack, Center, Stack, Heading, AspectRatio, HStack, NativeBaseProvider } from "native-base";
 import Swiper from 'react-native-swiper';
 import { getJobs } from '../../database/jobs';
@@ -18,6 +18,17 @@ const HomeScreen = ({ navigation }) => {
   const [bidderIdMap, setBidderIdMap] = useState({});
   const [submittedBids, setSubmittedBids] = useState([]);
   const [bidCountMap, setBidCountMap] = useState({}); // State for storing bid counts
+  const [showActivityIndicator, setShowActivityIndicator] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowActivityIndicator(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     const backAction = () => {
@@ -117,123 +128,136 @@ const HomeScreen = ({ navigation }) => {
         console.log(error);
       }
     };
-  
+
     fetchJobs();
   }, []);
-  
-  
+
+
 
   return (
     <ScrollView>
-      <View>
-        <Swiper
-          loop
-          autoplay
-          style={{ height: 250 }}
-        >
-          <Image
-            source={require('../../images/5326050.jpg')}
-            resizeMode="center"
-            style={{ flex: 1, height: 360, width: 450 }}
-          />
-
-          <Image
-            source={require('../../images/4786.jpg')}
-            resizeMode="center"
-            style={{ flex: 1, height: "100%", width: "100%" }}
-          />
-        </Swiper>
-
-        <Box bg="#fff" alignItems="center" justifyContent="center">
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Welcome to Skill<Text style={{ color: "blue" }}>Finder
-          </Text>App</Text>
-        </Box>
-
-        {jobs.length === 0 ? (
-          <View style={styles.noJobsContainer}>
-            <Ionicons name="alert-circle-outline" size={64} color="gray" />
-            <Text style={styles.noJobsText}>No jobs found</Text>
+      {
+        showActivityIndicator
+          ?
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            {/* <ActivityIndicator size="large" color="blue" /> */}
           </View>
-        ) : (
-          jobs.map((job) => (
-            <Box key={job.jobId} style={{ marginTop: 15 }} rounded="lg" overflow="hidden" borderColor="coolGray.200" borderWidth="1" _dark={{
-              borderColor: "coolGray.600",
-              backgroundColor: "gray.700"
-            }} _web={{
-              shadow: 2,
-              borderWidth: 0
-            }} _light={{
-              backgroundColor: "gray.50"
-            }}
+          :
+
+          <View>
+            <Swiper
+              loop
+              autoplay
+              style={{ height: 250 }}
             >
-              <Box>
-              </Box>
-              <Stack p="4" space={3}>
-                <Stack space={2}>
-                  <Heading size="md" ml="-1">
-                    {job.title}
-                  </Heading>
-                  <Text fontSize="xs" _light={{
-                    color: "violet.500"
-                  }} _dark={{
-                    color: "violet.400"
-                  }} fontWeight="500" ml="-0.5" mt="-1">
-                    Category: {job.category}
-                  </Text>
-                  <Text fontSize="xs" _light={{
-                    color: "violet.500"
-                  }} _dark={{
-                    color: "violet.400"
-                  }} fontWeight="500" ml="-0.5" mt="-1">
-                    salary: {job.salary + "Pkr / Hour"}
-                  </Text>
-                  <Text fontSize="xs" _light={{
-                    color: "violet.500"
-                  }} _dark={{
-                    color: "violet.400"
-                  }} fontWeight="500" ml="-0.5" mt="-1">
-                    Duration: {job.duration}
-                  </Text>
-                  <HStack alignItems="center">
-                    <Text color="coolGray.600" _dark={{
-                      color: "warmGray.200"
-                    }} fontWeight="400">
-                      {moment(job.time).format('MMMM Do YYYY, h:mm a')}
-                    </Text>
-                  </HStack>
-                </Stack>
-                <Text fontWeight="400">
-                  {job.description}
-                </Text>
-                {bidCountMap[job.jobId] !== undefined && (
-                  <Text fontWeight="400">
-                    Total Bids: {bidCountMap[job.jobId]} {/* Display the bid count */}
-                  </Text>
-                )}
-                {bidButtonTextMap[job.jobId] && (
-                  <HStack alignItems="center" space={4} justifyContent="space-between">
-                    <Button
-                      onPress={() => {
-                        navigation.navigate("Bid Now", {
-                          jobPosterId: job.jobPosterId,
-                          jobId: job.jobId,
-                          jobTitle: job.title,
-                          bidId: bidIdMap[job.jobId],
-                          bidderId: bidderIdMap[job.jobId],
-                        });
-                      }}
-                      title={submittedBids.includes(bidIdMap[job.jobId]) ? "Bid Submitted" : bidButtonTextMap[job.jobId]}
-                      disabled={submittedBids.includes(bidIdMap[job.jobId])} // Disable the button if the bid has been submitted
-                    />
-                  </HStack>
-                )}
+              <Image
+                source={require('../../images/5326050.jpg')}
+                resizeMode="center"
+                style={{ flex: 1, height: 360, width: 450 }}
+              />
 
+              <Image
+                source={require('../../images/4786.jpg')}
+                resizeMode="center"
+                style={{ flex: 1, height: "100%", width: "100%" }}
+              />
+            </Swiper>
 
-              </Stack>
+            <Box bg="#fff" alignItems="center" justifyContent="center">
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>Welcome to Skill<Text style={{ color: "blue" }}>Finder
+              </Text>App</Text>
             </Box>
-          ))
-        )}
-      </View>
+
+            {jobs.length === 0 ? (
+              <View style={styles.noJobsContainer}>
+                <Ionicons name="alert-circle-outline" size={64} color="gray" />
+                <Text style={styles.noJobsText}>No jobs found</Text>
+              </View>
+            ) : (
+              jobs.map((job) => (
+                <Box key={job.jobId} style={{ marginTop: 15 }} rounded="lg" overflow="hidden" borderColor="coolGray.200" borderWidth="1" _dark={{
+                  borderColor: "coolGray.600",
+                  backgroundColor: "gray.700"
+                }} _web={{
+                  shadow: 2,
+                  borderWidth: 0
+                }} _light={{
+                  backgroundColor: "gray.50"
+                }}
+                >
+                  <Box>
+                  </Box>
+                  <Stack p="4" space={3}>
+                    <Stack space={2}>
+                      <Heading size="md" ml="-1">
+                        {job.title}
+                      </Heading>
+                      <Text fontSize="xs" _light={{
+                        color: "violet.500"
+                      }} _dark={{
+                        color: "violet.400"
+                      }} fontWeight="500" ml="-0.5" mt="-1">
+                        Category: {job.category}
+                      </Text>
+                      <Text fontSize="xs" _light={{
+                        color: "violet.500"
+                      }} _dark={{
+                        color: "violet.400"
+                      }} fontWeight="500" ml="-0.5" mt="-1">
+                        salary: {job.salary + "Pkr / Hour"}
+                      </Text>
+                      <Text fontSize="xs" _light={{
+                        color: "violet.500"
+                      }} _dark={{
+                        color: "violet.400"
+                      }} fontWeight="500" ml="-0.5" mt="-1">
+                        Duration: {job.duration}
+                      </Text>
+                      <HStack alignItems="center">
+                        <Text color="coolGray.600" _dark={{
+                          color: "warmGray.200"
+                        }} fontWeight="400">
+                          {moment(job.time).format('MMMM Do YYYY, h:mm a')}
+                        </Text>
+                      </HStack>
+                    </Stack>
+                    <Text fontWeight="400">
+                      {job.description}
+                    </Text>
+                    {bidCountMap[job.jobId] !== undefined && (
+                      <Text fontWeight="400">
+                        Total Bids: {bidCountMap[job.jobId]} {/* Display the bid count */}
+                      </Text>
+                    )}
+                    {bidButtonTextMap[job.jobId] && (
+                      <HStack alignItems="center" space={4} justifyContent="space-between">
+                        <Button
+                          onPress={() => {
+                            navigation.navigate("Bid Now", {
+                              jobPosterId: job.jobPosterId,
+                              jobId: job.jobId,
+                              jobTitle: job.title,
+                              bidId: bidIdMap[job.jobId],
+                              bidderId: bidderIdMap[job.jobId],
+                            });
+                          }}
+                          title={submittedBids.includes(bidIdMap[job.jobId]) ? "Bid Submitted" : bidButtonTextMap[job.jobId]}
+                          disabled={submittedBids.includes(bidIdMap[job.jobId])} // Disable the button if the bid has been submitted
+                        />
+                      </HStack>
+                    )}
+
+
+                  </Stack>
+                </Box>
+              ))
+            )}
+          </View>
+      }
     </ScrollView>
   );
 };

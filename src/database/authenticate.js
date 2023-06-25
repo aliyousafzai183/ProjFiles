@@ -36,7 +36,6 @@ export const checkEmailVerificationStatus = (callback) => {
     if (user) {
       // User is signed in
       const isEmailVerified = user.emailVerified;
-      console.log(isEmailVerified);
       callback(isEmailVerified);
     } else {
       // User is signed out
