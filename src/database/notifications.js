@@ -43,36 +43,17 @@ export const addNotification = async (userId, title, description, type) => {
   }
 };
 
-export const listenToNewItems = (userId, callback) => {
-  const notificationsRef = collection(db, 'notifications');
-  const queryRef = query(notificationsRef, orderBy('createdAt', 'desc'));
-
-  const unsubscribe = onSnapshot(queryRef, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
-        const newItem = {
-          notificationId: change.doc.id,
-          ...change.doc.data()
-        };
-        if (newItem.userId === userId) {
-          callback(newItem);
-          showNotification(newItem.title, newItem.limitedDescription); // Show the notification
-        }
-      }
+export const getUnreadNotifications = async (userId, lastReceivedTimestamp, callback) => {
+  try {
+    getNotifications(userId, (allNotifications) => {
+      
+      const unreadNotifications = allNotifications.filter(notification =>
+        notification.createdAt.seconds > lastReceivedTimestamp
+        );
+      callback(unreadNotifications);
     });
-  });
-
-  return unsubscribe;
-};
-
-
-// Function to show the notification using Expo Notifications
-const showNotification = async (title, body) => {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: title,
-      body: body,
-    },
-    trigger: null,
-  });
+  } catch (error) {
+    console.log('Error retrieving unread notifications:', error);
+    callback([]);
+  }
 };

@@ -28,8 +28,6 @@ export const Signup = async (email, password, userRole) => {
   }
 };
 
-
-// function to handle email verification status
 // function to handle email verification status
 export const checkEmailVerificationStatus = (callback) => {
   onAuthStateChanged(auth, (user) => {
@@ -88,8 +86,6 @@ export const Signin = async (email, password, callback) => {
     callback(null, errorMessage);
   }
 };
-
-
 
 export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {
   try {

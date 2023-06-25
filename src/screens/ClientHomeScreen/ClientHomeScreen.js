@@ -2,9 +2,85 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, NativeBaseProvider, Box, Center, Container, Heading, VStack, HStack } from "native-base";
 import Swiper from 'react-native-swiper';
+import * as Notifications from 'expo-notifications';
+import { getUnreadNotifications, getNotifications } from '../../database/notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ClientHomeScreen = ({ navigation }) => {
   const [showActivityIndicator, setShowActivityIndicator] = useState(true);
+
+  // Store the last received notification timestamp
+  const storeLastReceivedTimestamp = async (timestamp) => {
+    try {
+      await AsyncStorage.setItem('lastReceivedTimestamp1', timestamp);
+    } catch (error) {
+      console.log('Error storing last received timestamp:', error);
+    }
+  };
+
+  // Retrieve the last received notification timestamp
+  const getLastReceivedTimestamp = async () => {
+    try {
+      const timestamp = await AsyncStorage.getItem('lastReceivedTimestamp1');
+      return timestamp;
+    } catch (error) {
+      console.log('Error retrieving last received timestamp:', error);
+      return null;
+    }
+  };
+
+  const getUserId = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      return userId;
+    } catch (error) {
+      console.log('Error retrieving userId:', error);
+      return null;
+    }
+  };
+
+  const showNotification = async (title, body) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: title,
+        body: body,
+      },
+      trigger: null,
+    });
+  };
+
+  useEffect(() => {
+    let unsubscribe;
+    const fetchUnreadNotifications = async () => {
+      await getUserId().then((userId) => {
+        getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
+
+          getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
+            newNotifications.forEach((element) => {
+              showNotification(element.title, element.limitedDescription);
+            });
+            if (newNotifications.length > 0) {
+              const latestTimestamp = newNotifications[0].createdAt.seconds;
+              storeLastReceivedTimestamp(latestTimestamp.toString());
+            }
+            // });
+          });
+        })
+      }).catch((error) => {
+        console.log('Error retrieving userId:', error);
+      });
+
+    };
+
+    fetchUnreadNotifications();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
+
   const handleSearch = (searchText) => {
     navigation.navigate('View Seller', { category: searchText });
   };
@@ -21,7 +97,7 @@ const ClientHomeScreen = ({ navigation }) => {
 
   return (
     <View style={{
-      flex:1
+      flex: 1
     }}>
       {
         showActivityIndicator

@@ -8,6 +8,8 @@ import { checkBidExists } from '../../database/bids';
 import { getBidCountByJobId } from '../../database/bids'; // Import the new function
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
+import { getUnreadNotifications, getNotifications } from '../../database/notifications';
 
 const HomeScreen = ({ navigation }) => {
   const [jobs, setJobs] = useState([]);
@@ -49,6 +51,69 @@ const HomeScreen = ({ navigation }) => {
     );
     return () => backHandler.remove();
   }, []);
+
+  // Store the last received notification timestamp
+  const storeLastReceivedTimestamp = async (timestamp) => {
+    try {
+      await AsyncStorage.setItem('lastReceivedTimestamp2', timestamp);
+    } catch (error) {
+      console.log('Error storing last received timestamp:', error);
+    }
+  };
+
+  // Retrieve the last received notification timestamp
+  const getLastReceivedTimestamp = async () => {
+    try {
+      const timestamp = await AsyncStorage.getItem('lastReceivedTimestamp2');
+      return timestamp;
+    } catch (error) {
+      console.log('Error retrieving last received timestamp:', error);
+      return null;
+    }
+  };
+
+  const showNotification = async (title, body) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: title,
+        body: body,
+      },
+      trigger: null,
+    });
+  };
+
+  useEffect(() => {
+    let unsubscribe;
+    const fetchUnreadNotifications = async () => {
+      await getUserId().then((userId) => {
+        getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
+
+          getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
+            newNotifications.forEach((element) => {
+              showNotification(element.title, element.limitedDescription);
+            });
+            if (newNotifications.length > 0) {
+              const latestTimestamp = newNotifications[0].createdAt.seconds;
+              storeLastReceivedTimestamp(latestTimestamp.toString());
+            }
+            // });
+          });
+        })
+      }).catch((error) => {
+        console.log('Error retrieving userId:', error);
+      });
+
+    };
+
+    fetchUnreadNotifications();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
+
 
   const checkBid = async (jobId, bidderId) => {
     checkBidExists(jobId, bidderId, (bidId) => {

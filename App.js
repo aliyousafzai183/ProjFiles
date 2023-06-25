@@ -3,9 +3,7 @@ import RootNavigator from './src/routes/RootNavigator';
 import { View, Platform } from 'react-native';
 import { app } from "./src/database/config";
 import * as Notifications from 'expo-notifications';
-import { getNotifications, addNotification, listenToNewItems } from './src/database/notifications'; // Replace with your file name
 import { useState, useEffect, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -54,23 +52,10 @@ const registerForPushNotificationsAsync = async () => {
 const App = () => {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
-  const [userId, setUserId] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  const getUserId = async () => {
-    try {
-      const userId = await AsyncStorage.getItem('userId');
-      setUserId(userId);
-      return userId;
-    } catch (error) {
-      console.log('Error retrieving userId:', error);
-      return null;
-    }
-  };
-
   useEffect(() => {
-    getUserId();
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
@@ -81,15 +66,9 @@ const App = () => {
       console.log(response);
     });
 
-    const unsubscribe = listenToNewItems(userId, (newItem) => {
-      console.log('New notification received:', newItem);
-      // You can update your UI or take any other action based on the new notification
-    });
-
     return () => {
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
-      unsubscribe(); // Unsubscribe from listening to new notifications
     };
   }, []);
 
