@@ -9,7 +9,7 @@ import { db } from '../../../database/config';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 const CreateProfileClientScreen = ({ navigation, route }) => {
-  const { editing } = route.params;
+  const { editing, email } = route.params;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   // const [email, setEmail] = useState('');
@@ -159,7 +159,7 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
         firstName,
         lastName,
         contact,
-        'abc#gmail.com',
+        email,
         "nothing",
         "haha",
         '3443',

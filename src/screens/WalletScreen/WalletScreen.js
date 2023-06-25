@@ -4,18 +4,17 @@ import { View, Text, StyleSheet, TouchableOpacity, Share, BackHandler, ScrollVie
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { captureRef } from 'react-native-view-shot';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const InvoiceScreen = ({ navigation }) => {
   const [completed, setCompleted] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [role, setRole] = useState('');
   const invoiceRef = useRef(null);
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   const fetchData = async () => {
     const role = await AsyncStorage.getItem('role');
     const userId = await AsyncStorage.getItem('userId');
-
+    setRole(role);
     if (role === 'Seller' && userId) {
       getAllBidsForSeller(userId, (bids) => {
         setCompleted(bids);
@@ -95,7 +94,7 @@ const InvoiceScreen = ({ navigation }) => {
             <View key={index} style={styles.invoiceItemContainer}>
               <Text style={styles.jobTitle}>{bid.jobTitle}</Text>
               <Text style={styles.bidAmount}>Pkr {bid.bidAmount}</Text>
-              <Text style={styles.paymentStatus}>{bid.status === 'completed' ? 'Paid' : 'Pending'}</Text>
+              <Text style={styles.paymentStatus}>{bid.status === 'completed' ? role === "Buyer" ? 'Released' : 'Received' : 'Pending'}</Text>
             </View>
           )
         ))}
@@ -220,11 +219,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 15
   },
-  listContainer:{
-    backgroundColor:'#FFF',
-    paddingVertical:10,
-    paddingHorizontal:15,
-    borderRadius:20
+  listContainer: {
+    backgroundColor: '#FFF',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20
   }
 
 });

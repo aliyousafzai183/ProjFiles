@@ -100,27 +100,28 @@ const HomeScreen = ({ navigation }) => {
           setJobs(jobs);
           setTime(currentTime);
           setJobTime(currentTime); // Store the job time in the state
-          jobs.forEach((job) => {
+          jobs.forEach(async (job) => {
             checkBids(job);
-            getBidCountByJobId(job.jobId)
-              .then((count) => {
-                setBidCountMap((prevState) => ({
-                  ...prevState,
-                  [job.jobId]: count
-                }));
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+            try {
+              const count = await getBidCountByJobId(job.jobId);
+              setBidCountMap((prevState) => ({
+                ...prevState,
+                [job.jobId]: count
+              }));
+            } catch (error) {
+              console.log(error);
+            }
           });
         });
       } catch (error) {
         console.log(error);
       }
     };
-
+  
     fetchJobs();
   }, []);
+  
+  
 
   return (
     <ScrollView>

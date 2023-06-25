@@ -3,8 +3,9 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native
 import { getUsersByCategory } from '../../database/authenticate';
 import { AntDesign } from '@expo/vector-icons';
 import { getRatings } from '../../database/ratings';
+import { getNoOfBidsForSeller } from '../../database/bids';
 
-const ViewSellers = ({ route , navigation }) => {
+const ViewSellers = ({ route, navigation }) => {
     const { category } = route.params;
     const [users, setUsers] = useState([]);
     const [ratings, setRatings] = useState([]);
@@ -46,13 +47,13 @@ const ViewSellers = ({ route , navigation }) => {
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
-         style={styles.userItem}
-         onPress={() => navigation.navigate('Seller Profile', { userId: item.contact })}
-         >
+            style={styles.userItem}
+            onPress={() => navigation.navigate('Seller Profile', { userId: item.email })}
+        >
             <Text style={styles.userName}>{`${item.firstName} ${item.lastName}`}</Text>
-            <Text style={styles.userEmail}>Email: {item.email}</Text>
+            <Text style={styles.userContact}>Email: {item.email}</Text>
             <Text style={styles.userContact}>Mobile : {item.contact}</Text>
-            <Text style={styles.userCountry}>From : {item.country}</Text>
+            <Text style={styles.userCountry}>From : {item.address + ", " + item.country}</Text>
             <Text style={styles.userContact}>Ratings : {calculateRatings(item.userId) ? calculateRatings(item.userId) + " / 5" : "New Seller"}</Text>
         </TouchableOpacity>
     );
@@ -81,6 +82,13 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#F5F5F5',
+    },
+    headingWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 5,
+
     },
     userItem: {
         backgroundColor: '#FFFFFF',

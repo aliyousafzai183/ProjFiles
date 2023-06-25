@@ -91,24 +91,26 @@ export const getAllBidsForBuyer = (userId, callback) => {
 
 export const getNoOfBidsForSeller = (userId, status, callback) => {
     const bidsRef = collection(db, 'bids');
-  
+
     onSnapshot(bidsRef, (snapshot) => {
-      let count = 0;
-      let earnings = 0;
-  
-      snapshot.forEach((doc) => {
-        const bid = doc.data();
-  
-        if (bid.bidderId === userId && bid.status === status) {
-          count++;
-          earnings += parseInt(bid.bidAmount, 10); // Parse the bid value to an integer
-        }
-      });
-  
-      callback(count, earnings);
+        let count = 0;
+        let earnings = 0;
+
+        snapshot.forEach((doc) => {
+            const bid = doc.data();
+            // console.log(bid);
+            console.log(userId);
+
+            if ((bid.email === userId || bid.bidderId === userId) && bid.status === status ) {
+                count++;
+                earnings += parseInt(bid.bidAmount, 10); // Parse the bid value to an integer
+            }
+        });
+
+        callback(count, earnings);
     });
-  };
-  
+};
+
 
 export const getBidsForSeller = (userId, status, callback) => {
     const bidsRef = collection(db, 'bids');
@@ -271,15 +273,17 @@ export const checkBidExists = (jobId, bidderId, callback) => {
     });
 };
 
-export const getBidCountByJobId = async (jobId) => {
+export const getBidCountByJobId = (jobId) => {
     const bidsRef = collection(db, 'bids');
     const queryRef = query(bidsRef, where('jobId', '==', jobId));
-
-    const snapshot = await getDocs(queryRef);
-    const numberOfBids = snapshot.size;
-
-    return numberOfBids;
-};
+  
+    return new Promise((resolve, reject) => {
+      const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+        const numberOfBids = snapshot.size;
+        resolve(numberOfBids);
+      }, reject);
+    });
+  };
 
 export const getBidByJobIdAndBidderId = async (jobId, bidderId, callback) => {
     const bidsRef = collection(db, 'bids');

@@ -118,7 +118,7 @@ export const getUserDataById = (userId, callback) => {
   const userCollectionRef = collection(db, 'users');
 
   const queryById = doc(userCollectionRef, userId);
-  const queryByContact = query(userCollectionRef, where('contact', '==', userId));
+  const queryByContact = query(userCollectionRef, where('email', '==', userId));
 
   const unsubscribeById = onSnapshot(queryById, (docSnapshot) => {
     if (docSnapshot.exists()) {

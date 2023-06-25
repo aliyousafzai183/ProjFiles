@@ -3,19 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput,
 import { getJobById } from '../../database/jobs';
 import { getUserData } from '../../database/authenticate';
 import { updateBidStatus, getBidByBidId, DeliverBid } from '../../database/bids';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const ViewJobScreen = ({ route, navigation }) => {
   const [buyerData, setBuyerData] = useState(null);
   const [jobData, setJobData] = useState([]);
   const [bidData, setBidData] = useState(null);
-  const [delivery, setDelivery] = useState('');
+  const [delivery, setDelivery] = useState('Delivered');
   const [modalVisible, setModalVisible] = useState(false); // State to control the visibility of the modal
   const { type } = route.params;
   const buyerId = route.params.buyerId;
   const jobId = route.params.jobId;
   const bidId = route.params.bidId;
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
 
   useEffect(() => {
@@ -106,11 +104,11 @@ const ViewJobScreen = ({ route, navigation }) => {
           <View>
             {bidData?.delivery && (
               <>
-                <TouchableOpacity style={styles.button} onPress={handleViewDelivery}>
+                {/* <TouchableOpacity style={styles.button} onPress={handleViewDelivery}>
                   <Text style={styles.buttonText}>View Delivery</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleDeliverNow}>
-                  <Text style={styles.buttonText}>Deliver Again</Text>
+                </TouchableOpacity> */}
+                <TouchableOpacity style={styles.button} onPress={handleDeliverNow} disabled={true} >
+                  <Text style={styles.buttonText}>Delivered</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -135,7 +133,7 @@ const ViewJobScreen = ({ route, navigation }) => {
         </View>
       )}
 
-      {jobData && (
+      {jobData && (type==='offers' || type==='appliedfor') &&(
         <View style={styles.section}>
           <Text style={styles.heading}>Job Details</Text>
           <Text style={styles.label}>Title:</Text>
@@ -160,8 +158,8 @@ const ViewJobScreen = ({ route, navigation }) => {
           <Text style={styles.text}>{bidData.coverLetter}</Text>
           <Text style={styles.label}>Budget:</Text>
           <Text style={styles.text}>{bidData.bidAmount} Pkr/hour</Text>
-          <Text style={styles.label}>Duration:</Text>
-          <Text style={styles.text}>{bidData.name}</Text>
+          {/* <Text style={styles.label}>Duration:</Text>
+          <Text style={styles.text}>{bidData.duration}</Text> */}
         </View>
       )}
 
@@ -182,18 +180,18 @@ const ViewJobScreen = ({ route, navigation }) => {
       {/* Modal */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Enter Cloud Drive URL which contains files or images of your work:</Text>
-          <TextInput
+          <Text style={styles.modalTitle}>Are you sure that you have completed your work ?</Text>
+          {/* <TextInput
             style={styles.modalInput}
             onChangeText={(text) => setDelivery(text)}
             value={delivery}
             placeholder="Cloud Drive URL"
-          />
-          <TouchableOpacity style={styles.modalButton} onPress={handleModalSubmit}>
-            <Text style={styles.modalButtonText}>Submit</Text>
+          /> */}
+          <TouchableOpacity style={styles.modalButton1} onPress={handleModalSubmit}>
+            <Text style={styles.modalButtonText}>Yes</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
-            <Text style={styles.modalButtonText}>Cancel</Text>
+            <Text style={styles.modalButtonText}>No</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -255,7 +253,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   modalButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: 'skyblue',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: 120,
+    alignItems: 'center',
+  },
+  modalButton1: {
+    backgroundColor: 'skyblue',
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,

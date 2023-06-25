@@ -90,9 +90,10 @@ const ViewBidsScreen = ({ navigation }) => {
                   onPress={() => {
                     handleViewDelivery(bid.delivery);
                   }}
+                  disabled={true}
                 >
 
-                  <Text style={styles.jobTitle}>"View Delivery"</Text>
+                  <Text style={styles.jobTitle}>"Delivered"</Text>
                 </TouchableOpacity>
               )
             }
@@ -105,8 +106,8 @@ const ViewBidsScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <Text style={styles.detailValue}>{bid.email}</Text>
-          <Text style={styles.detailValue2}>Work Status: {bid.delivery ? "Completed" : "Ongoing"}</Text>
-          <Text style={styles.detailValue2}>Payment Status:  {bid.delivery ? "Released" : "Pending"}</Text>
+          <Text style={styles.detailValue2}>Work Status: {bid.status === 'completed' ? "Completed" : "Ongoing"}</Text>
+          <Text style={styles.detailValue2}>Payment Status:  {bid.status === 'completed'? "Released" : "Pending"}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.sendButton]}

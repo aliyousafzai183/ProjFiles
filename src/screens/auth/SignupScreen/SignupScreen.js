@@ -32,7 +32,7 @@ const SignupScreen = ({ navigation, route }) => {
         const userId = await Signup(email, password, role);
         if (userId && isClient) {
           AsyncStorage.setItem('role', 'Buyer');
-          navigation.navigate('Buyer Account', { editing: false });
+          navigation.navigate('Buyer Account', { editing: false, email: email });
         } else if (userId && !isClient) {
           AsyncStorage.setItem('role', 'Seller');
           navigation.navigate('Register Alert', { editing: false, email: email });

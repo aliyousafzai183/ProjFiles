@@ -15,6 +15,7 @@ const ProfileScreen = ({ route }) => {
     const [about, setAbout] = useState('');
     const [skills, setSkills] = useState([]);
     const [jobs, setJobs] = useState(0);
+    const [ongoingJobs, setOngoingJobs] = useState(0);
     const [earnings, setEarnings] = useState(0);
     const [ratings, setRatings] = useState([]);
 
@@ -56,7 +57,6 @@ const ProfileScreen = ({ route }) => {
                         setCnic(data.cnic || '');
                         setAbout(data.about || '');
                         setSkills(data.skills);
-                        console.log(data.skills);
                     }
                 });
             }
@@ -68,6 +68,16 @@ const ProfileScreen = ({ route }) => {
                 setEarnings(earnings);
             });
         };
+
+        const ongoingOrders = async () => {
+            try {
+                getNoOfBidsForSeller(route.params.userId, 'accepted', (count, earnings) => {
+                    setOngoingJobs(count);
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
         const fetchRatings = async () => {
             try {
@@ -82,30 +92,46 @@ const ProfileScreen = ({ route }) => {
         fetchRatings();
         fetchData();
         fetchJobs();
+        ongoingOrders();
     }, []);
 
     return (
         <ScrollView
             style={styles.container}
             contentContainerStyle={{
-                paddingBottom: 20
+                paddingBottom: 100
             }}
         >
-            <Text style={styles.heading}>{firstName}  Profile</Text>
+            <View style={styles.headingWrapper}>
+                <Text style={styles.heading}>{firstName}  Profile</Text>
+                <Text style={styles.ongoinOrders}>({ongoingJobs}) Ongoing orders</Text>
+            </View>
 
             <View style={styles.sectionRatings}>
 
                 <View style={styles.section1}>
-                    <Text style={styles.label}>Jobs</Text>
+                    <Text style={styles.label}>Total Jobs</Text>
                     <Text style={styles.label}>{jobs}</Text>
                 </View>
                 <View style={styles.section1}>
                     <Text style={styles.label}>Ratings</Text>
-                    <Text style={styles.label}>{calculateRatings() ? calculateRatings(route.params.userId) + " / 5" : "Not Rated Yet!"}</Text>
+                    <Text style={styles.label}>{calculateRatings() ? calculateRatings(route.params.userId) + " / 5" : "New Seller"}</Text>
+                </View>
+
+            </View>
+            <View style={styles.sectionRatings}>
+                <View style={styles.section1}>
+                    <Text style={styles.label}>Total Earnings</Text>
+                    <Text style={styles.label}>Pkr: {formatEarnings(earnings)}</Text>
                 </View>
                 <View style={styles.section1}>
-                    <Text style={styles.label}>Earnings</Text>
-                    <Text style={styles.label}>Pkr: {formatEarnings(earnings)}</Text>
+                    <Text style={styles.label}>Order Rate</Text>
+                    {
+                        jobs ? 
+                        <Text style={styles.label}>Pkr: {formatEarnings(earnings)/jobs}</Text>
+                        :
+                        <Text style={styles.label}>Pkr: 0</Text>
+                    }
                 </View>
 
             </View>
@@ -155,10 +181,16 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
     },
+    headingWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+
+    },
     heading: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
     },
     sectionRatings: {
         marginBottom: 20,
@@ -174,7 +206,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'skyblue',
-        width: '32%',
+        width: '45%',
         height: '100%'
     },
     section: {
@@ -206,6 +238,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         color: '#555',
     },
+    ongoinOrders: {
+        fontSize: 15,
+        color: 'black'
+    }
 });
 
 export default ProfileScreen;
