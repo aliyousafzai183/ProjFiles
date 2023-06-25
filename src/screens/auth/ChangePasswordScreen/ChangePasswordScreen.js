@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { getAuth, updatePassword } from 'firebase/auth';
-import NotificationLogic from '../../NotificationLogic/NotificationLogic';
 
 const ChangePasswordScreen = ({navigation}) => {
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');

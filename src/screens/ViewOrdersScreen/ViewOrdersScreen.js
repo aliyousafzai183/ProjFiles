@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { getBidsForBuyer, updateBidStatus } from '../../database/bids';
 import { LogBox } from 'react-native';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 LogBox.ignoreLogs(['Excessive number of pending callbacks']);
 
@@ -20,7 +19,6 @@ const ViewBidsScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPerformingOperation, setIsPerformingOperation] = useState(false);
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   useEffect(() => {
     const fetchBids = async () => {

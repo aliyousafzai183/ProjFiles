@@ -1,9 +1,7 @@
 import React, {useEffect} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // import the icons from the expo vector icons library
-import NotificationLogic from '../NotificationLogic/NotificationLogic'
 const JobScreen = ({navigation}) => {
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   return (
     <View style={styles.container}>

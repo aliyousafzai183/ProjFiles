@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Linking } from 'react-native';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const FaqScreen = () => {
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
   const [faqs, setFaqs] = useState([
     {
       id: '1',

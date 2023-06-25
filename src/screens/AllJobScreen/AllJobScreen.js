@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView
 import { getJobsByBuyerId, deleteJob } from '../../database/jobs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const AllJobScreen = ({ navigation }) => {
     const [jobs, setJobs] = useState([]);

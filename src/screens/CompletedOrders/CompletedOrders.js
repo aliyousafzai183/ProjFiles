@@ -3,10 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { getBidsForBuyer, updateBidStatus } from '../../database/bids';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const Completedorders = ({ navigation }) => {
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   const [orders, setorders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Keyboard
 import { sendMessage, receiveMessage } from '../../database/messages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const MessageScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
@@ -11,7 +10,6 @@ const MessageScreen = ({ navigation, route }) => {
   const [role, setRole] = useState('Seller');
   const { jobPosterId, bidderId } = route.params;
   const flatListRef = useRef(null);
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
   useEffect(() => {
     const unsubscribe = receiveMessage(jobPosterId, bidderId, (messageList) => {
       setMessages(messageList);

@@ -4,7 +4,6 @@ import { TextInput } from 'react-native-paper';
 import DropDown from "react-native-paper-dropdown";
 import { postJob, getJobById, deleteJob } from '../../database/jobs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const PostJobScreen = ({ navigation, route }) => {
   const { jobId, userId } = route.params ?? {}; // Use optional chaining (??) to handle undefined route.params
@@ -17,7 +16,6 @@ const PostJobScreen = ({ navigation, route }) => {
   const [jobPosterId, setJobPosterId] = useState('');
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(true); // Added loading state
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
 
   useEffect(() => {
     // Fetch jobPosterId from AsyncStorage and set it in the state

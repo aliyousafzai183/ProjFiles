@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet, ToastAndroid, ActivityIndicat
 import { TextInput } from 'react-native-paper';
 import { getBidByJobIdAndBidderId, postBid } from '../../database/bids';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NotificationLogic from '../NotificationLogic/NotificationLogic';
 
 const BidNowScreen = ({ navigation, route }) => {
   const { jobId, jobPosterId, jobTitle, bidId } = route.params;
@@ -14,7 +13,6 @@ const BidNowScreen = ({ navigation, route }) => {
   const [bidderId, setBidderId] = useState('');
   const [isNew, setIsNew] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const { notifications, showIndicator, notificationsEnabled } = NotificationLogic();
   useEffect(() => {
     const fetchBidDetails = async () => {
       try {
