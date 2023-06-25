@@ -1,5 +1,6 @@
 import { db } from './config';
-import { collection, onSnapshot, query, orderBy, serverTimestamp, addDoc} from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, serverTimestamp, addDoc } from 'firebase/firestore';
+import * as Notifications from 'expo-notifications';
 
 export const getNotifications = (userId, callback) => {
   const notificationsRef = collection(db, 'notifications');
@@ -22,7 +23,6 @@ export const getNotifications = (userId, callback) => {
   });
 };
 
-
 export const addNotification = async (userId, title, description, type) => {
   try {
     const limitedDescription = description.split(' ').slice(0, 15).join(' ');
@@ -43,7 +43,7 @@ export const addNotification = async (userId, title, description, type) => {
   }
 };
 
-export const listenToNewItems = (callback) => {
+export const listenToNewItems = (userId, callback) => {
   const notificationsRef = collection(db, 'notifications');
   const queryRef = query(notificationsRef, orderBy('createdAt', 'desc'));
 
@@ -54,10 +54,25 @@ export const listenToNewItems = (callback) => {
           notificationId: change.doc.id,
           ...change.doc.data()
         };
-        callback(newItem);
+        if (newItem.userId === userId) {
+          callback(newItem);
+          showNotification(newItem.title, newItem.limitedDescription); // Show the notification
+        }
       }
     });
   });
 
   return unsubscribe;
+};
+
+
+// Function to show the notification using Expo Notifications
+const showNotification = async (title, body) => {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: title,
+      body: body,
+    },
+    trigger: null,
+  });
 };
