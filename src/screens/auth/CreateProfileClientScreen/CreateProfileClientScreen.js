@@ -85,7 +85,7 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
 
   const handleCreateProfile = async () => {
     // Check for empty or invalid values in the remaining fields
-    if (!firstName.trim() || !lastName.trim()) {
+    if (!firstName?.trim() || !lastName?.trim()) {
       ToastAndroid.show('Please enter your first and last name', ToastAndroid.SHORT);
       return;
     }
@@ -110,7 +110,7 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
     //   return;
     // }
 
-    if (!contact.trim() || !/^\d{11}$/.test(contact)) {
+    if (!contact?.trim() || !/^\d{11}$/.test(contact)) {
       ToastAndroid.show('Please enter a valid 11-digit number 03XXXXXXXXX', ToastAndroid.SHORT);
       return;
     }
@@ -120,7 +120,7 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
     //   return;
     // }
 
-    if (!profileImage.trim()) {
+    if (!profileImage?.trim()) {
       ToastAndroid.show('Please choose a profile image!', ToastAndroid.SHORT);
       return;
     }

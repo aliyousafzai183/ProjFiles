@@ -198,8 +198,10 @@ export const getUsersByCategory = (category, callback) => {
       const isSeller = userData.role === 'Seller';
 
       if (userData.category === category && isSeller) {
-        filteredUsers.push(userData);
-
+        filteredUsers.push({
+          id: doc.id,
+          ...userData,
+        });
       }
     });
 
@@ -211,6 +213,7 @@ export const getUsersByCategory = (category, callback) => {
 
   return unsubscribe; // Return the unsubscribe function to stop listening when needed
 };
+
 
 // Function to send a password reset email
 export const ForgotPassword = async (email) => {

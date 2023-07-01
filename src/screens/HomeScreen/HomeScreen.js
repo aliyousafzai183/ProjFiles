@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, ActivityIndicator, StyleSheet, ScrollView, Button, Alert, BackHandler } from 'react-native';
+import { Text, View, Image, TouchableOpacity, StyleSheet, ScrollView, Button, Alert, BackHandler } from 'react-native';
 import { Box, VStack, Center, Stack, Heading, AspectRatio, HStack, NativeBaseProvider } from "native-base";
 import Swiper from 'react-native-swiper';
 import { getJobs } from '../../database/jobs';
@@ -10,6 +10,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import { getUnreadNotifications, getNotifications } from '../../database/notifications';
+import { LogBox } from 'react-native';
+import { getUserData } from '../../database/authenticate';
+
+LogBox.ignoreLogs([
+  'Internal React error: Attempted to capture a commit phase error inside a detached tree.',
+  'ReferenceError: Can\'t find variable: unsubscribe',
+]);
 
 const HomeScreen = ({ navigation }) => {
   const [jobs, setJobs] = useState([]);
@@ -21,6 +28,67 @@ const HomeScreen = ({ navigation }) => {
   const [submittedBids, setSubmittedBids] = useState([]);
   const [bidCountMap, setBidCountMap] = useState({}); // State for storing bid counts
   const [showActivityIndicator, setShowActivityIndicator] = useState(true);
+
+  const [isProfileCompleted, setIsProfileCompleted] = useState(true);
+  const [role, setRole] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const storedRole = await AsyncStorage.getItem('role');
+        const userId = await AsyncStorage.getItem('userId');
+        const email = await AsyncStorage.getItem('email');
+        if (storedRole !== null) {
+          setRole(storedRole);
+        }
+        if (email !== null) {
+          setEmail(email);
+        }
+        if (userId !== null) {
+          getUserData(userId, (userData) => {
+            if (userData.firstName !== undefined) {
+              setIsProfileCompleted(true);
+            } else {
+              setIsProfileCompleted(false);
+            }
+          });
+        }
+      } catch (error) {
+        console.log('Error retrieving role or userId:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleBannerClick = (from) => {
+    if (from === 'banner') {
+      if (role === 'Seller') {
+        navigation.navigate('Register Alert', { editing: true, email: email });
+      } else if (role === 'Buyer') {
+        navigation.navigate('Buyer Account', { editing: true, email: email });
+      }
+    } else {
+      Alert.alert(
+        'Incomplete Profile!',
+        'Your profile is not completed. Please complete your profile to post a job.',
+        [
+          { text: 'Skip', onPress: () => { } },
+          {
+            text: 'OK', onPress: () => {
+              if (role === 'Seller') {
+                navigation.navigate('Register Alert', { editing: true, email: email });
+              } else if (role === 'Buyer') {
+                navigation.navigate('Buyer Account', { editing: true, email: email });
+              }
+            }
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,13 +121,12 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   // Store the last received notification timestamp
-  const storeLastReceivedTimestamp = async (timestamp) => {
-    try {
-      await AsyncStorage.setItem('lastReceivedTimestamp2', timestamp);
-    } catch (error) {
-      console.log('Error storing last received timestamp:', error);
-    }
-  };
+  // const storeLastReceivedTimestamp = async (timestamp) => {
+  //   try {
+  //   } catch (error) {
+  //     console.log('Error storing last received timestamp:', error);
+  //   }
+  // };
 
   // Retrieve the last received notification timestamp
   const getLastReceivedTimestamp = async () => {
@@ -83,19 +150,20 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    let unsubscribe;
     const fetchUnreadNotifications = async () => {
       await getUserId().then((userId) => {
         getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
 
           getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
-            newNotifications.forEach((element) => {
+            newNotifications.forEach(async (element) => {
+              // console.log(element);
               showNotification(element.title, element.limitedDescription);
+              await AsyncStorage.setItem('lastReceivedTimestamp2', element.createdAt.seconds.toString());
             });
-            if (newNotifications.length > 0) {
-              const latestTimestamp = newNotifications[0].createdAt.seconds;
-              storeLastReceivedTimestamp(latestTimestamp.toString());
-            }
+            // if (newNotifications.length > 0) {
+            //   const latestTimestamp = newNotifications[newNotifications.length-1].createdAt.seconds;
+            //   storeLastReceivedTimestamp(latestTimestamp.toString());
+            // }
             // });
           });
         })
@@ -107,11 +175,6 @@ const HomeScreen = ({ navigation }) => {
 
     fetchUnreadNotifications();
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
   }, []);
 
 
@@ -235,6 +298,26 @@ const HomeScreen = ({ navigation }) => {
             <Box bg="#fff" alignItems="center" justifyContent="center">
               <Text style={{ fontSize: 20, fontWeight: "bold" }}>Welcome to Skill<Text style={{ color: "blue" }}>Finder
               </Text>App</Text>
+              {
+                !isProfileCompleted && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleBannerClick("banner");
+                    }}
+                    style={{
+                      alignSelf: 'center',
+                      paddingHorizontal: 10,
+                      backgroundColor: 'red',
+                      borderRadius: 10,
+                      paddingVertical: 5,
+                      marginHorizontal: 10
+                    }}>
+                    <Text style={{
+                      color: 'white'
+                    }}>Incomplete profile! Complete your profile to activate your account!</Text>
+                  </TouchableOpacity>
+                )
+              }
             </Box>
 
             {jobs.length === 0 ? (
@@ -302,13 +385,17 @@ const HomeScreen = ({ navigation }) => {
                       <HStack alignItems="center" space={4} justifyContent="space-between">
                         <Button
                           onPress={() => {
-                            navigation.navigate("Bid Now", {
-                              jobPosterId: job.jobPosterId,
-                              jobId: job.jobId,
-                              jobTitle: job.title,
-                              bidId: bidIdMap[job.jobId],
-                              bidderId: bidderIdMap[job.jobId],
-                            });
+                            if (isProfileCompleted) {
+                              navigation.navigate("Bid Now", {
+                                jobPosterId: job.jobPosterId,
+                                jobId: job.jobId,
+                                jobTitle: job.title,
+                                bidId: bidIdMap[job.jobId],
+                                bidderId: bidderIdMap[job.jobId],
+                              });
+                            } else {
+                              handleBannerClick("button");
+                            }
                           }}
                           title={submittedBids.includes(bidIdMap[job.jobId]) ? "Bid Submitted" : bidButtonTextMap[job.jobId]}
                           disabled={submittedBids.includes(bidIdMap[job.jobId])} // Disable the button if the bid has been submitted

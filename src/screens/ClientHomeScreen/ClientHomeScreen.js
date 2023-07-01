@@ -5,18 +5,65 @@ import Swiper from 'react-native-swiper';
 import * as Notifications from 'expo-notifications';
 import { getUnreadNotifications, getNotifications } from '../../database/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LogBox } from 'react-native';
+import { getUserData } from '../../database/authenticate';
+
+LogBox.ignoreLogs([
+  'Internal React error: Attempted to capture a commit phase error inside a detached tree.',
+  'ReferenceError: Can\'t find variable: unsubscribe',
+]);
 
 const ClientHomeScreen = ({ navigation }) => {
   const [showActivityIndicator, setShowActivityIndicator] = useState(true);
+  const [isProfileCompleted, setIsProfileCompleted] = useState(true);
+  const [role, setRole] = useState('');
+  const [email, setEmail] = useState('');
 
-  // Store the last received notification timestamp
-  const storeLastReceivedTimestamp = async (timestamp) => {
-    try {
-      await AsyncStorage.setItem('lastReceivedTimestamp1', timestamp);
-    } catch (error) {
-      console.log('Error storing last received timestamp:', error);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const storedRole = await AsyncStorage.getItem('role');
+        const userId = await AsyncStorage.getItem('userId');
+        const email = await AsyncStorage.getItem('email');
+        if (storedRole !== null) {
+          setRole(storedRole);
+        }
+        if (email !== null) {
+          setEmail(email);
+        }
+        if (userId !== null) {
+          getUserData(userId, (userData) => {
+            if (userData.firstName !== undefined) {
+              setIsProfileCompleted(true);
+            }else{
+              setIsProfileCompleted(false);
+            }
+          });
+        }
+      } catch (error) {
+        console.log('Error retrieving role or userId:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleBannerClick = () => {
+    if (role === 'Seller') {
+      navigation.navigate('Register Alert', { editing: true, email: email });
+    } else if (role === 'Buyer') {
+      navigation.navigate('Buyer Account', { editing: true, email: email });
     }
   };
+
+  // Store the last received notification timestamp
+  // const storeLastReceivedTimestamp = async (timestamp) => {
+  //   try {
+  //     await AsyncStorage.setItem('lastReceivedTimestamp1', timestamp);
+  //   } catch (error) {
+  //     console.log('Error storing last received timestamp:', error);
+  //   }
+  // };
 
   // Retrieve the last received notification timestamp
   const getLastReceivedTimestamp = async () => {
@@ -50,19 +97,22 @@ const ClientHomeScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    let unsubscribe;
+    // let unsubscribe;
+
     const fetchUnreadNotifications = async () => {
       await getUserId().then((userId) => {
         getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
 
           getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
-            newNotifications.forEach((element) => {
+            newNotifications.forEach(async(element) => {
               showNotification(element.title, element.limitedDescription);
+              await AsyncStorage.setItem('lastReceivedTimestamp2', element.createdAt.seconds.toString());
+
             });
-            if (newNotifications.length > 0) {
-              const latestTimestamp = newNotifications[0].createdAt.seconds;
-              storeLastReceivedTimestamp(latestTimestamp.toString());
-            }
+            // if (newNotifications.length > 0) {
+            //   const latestTimestamp = newNotifications[newNotifications.length-1].createdAt.seconds;
+            //   storeLastReceivedTimestamp(latestTimestamp.toString());
+            // }
             // });
           });
         })
@@ -74,11 +124,6 @@ const ClientHomeScreen = ({ navigation }) => {
 
     fetchUnreadNotifications();
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
   }, []);
 
   const handleSearch = (searchText) => {
@@ -136,6 +181,24 @@ const ClientHomeScreen = ({ navigation }) => {
 
               <View>
                 <Center>
+                  {
+                    !isProfileCompleted && (
+                      <TouchableOpacity
+                        onPress={handleBannerClick}
+                        style={{
+                          alignSelf: 'center',
+                          paddingHorizontal: 10,
+                          backgroundColor: 'red',
+                          borderRadius: 10,
+                          paddingVertical: 5,
+                          marginHorizontal: 10
+                        }}>
+                        <Text style={{
+                          color: 'white'
+                        }}>Incomplete profile! Complete your profile to activate your account!</Text>
+                      </TouchableOpacity>
+                    )
+                  }
                   <Container style={{ paddingTop: 20 }}>
                     <Heading>
                       What are

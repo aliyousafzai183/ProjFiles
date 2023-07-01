@@ -17,6 +17,7 @@ import {
   resendVerificationEmail,
 } from '../../../database/authenticate';
 import { CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SigninScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -32,10 +33,9 @@ const SigninScreen = ({ navigation }) => {
     try {
       if (email && password) {
         setShowIndicator(true); // Show the activity indicator
-
+        await AsyncStorage.setItem("email", email);
         // Sign in with email and password
         await Signin(email, password, async (data, error) => {
-
           if (error) {
             console.log(error);
             return;
@@ -47,7 +47,7 @@ const SigninScreen = ({ navigation }) => {
           checkEmailVerificationStatus((isEmailVerified) => {
             if (isEmailVerified) {
               if (userRole === 'Buyer') {
-                if (isProfileCompleted) {
+                // if (isProfileCompleted) {
                   setEmail('');
                   setPassword('');
                   navigation.dispatch(
@@ -56,15 +56,15 @@ const SigninScreen = ({ navigation }) => {
                       routes: [{ name: 'Welcome Customer' }],
                     })
                   );
-                } else {
-                  ToastAndroid.show(
-                    'Complete your profile and sign in',
-                    ToastAndroid.SHORT
-                  );
-                  navigation.navigate('Buyer Account', { editing: false });
-                }
+                // } else {
+                //   ToastAndroid.show(
+                //     'Complete your profile and sign in',
+                //     ToastAndroid.SHORT
+                //   );
+                //   navigation.navigate('Buyer Account', { editing: false, email: email  });
+                // }
               } else if (userRole === 'Seller') {
-                if (isProfileCompleted) {
+                // if (isProfileCompleted) {
                   setEmail('');
                   setPassword('');
                   navigation.dispatch(
@@ -73,13 +73,13 @@ const SigninScreen = ({ navigation }) => {
                       routes: [{ name: 'Skill Finder' }],
                     })
                   );
-                } else {
-                  ToastAndroid.show(
-                    'Complete your profile and sign in',
-                    ToastAndroid.SHORT
-                  );
-                  navigation.navigate('Register Alert', { editing: false, email: email });
-                }
+                // } else {
+                //   ToastAndroid.show(
+                //     'Complete your profile and sign in',
+                //     ToastAndroid.SHORT
+                //   );
+                //   navigation.navigate('Register Alert', { editing: false, email: email });
+                // }
               } else {
                 console.log("Error in sign in screen");
               }

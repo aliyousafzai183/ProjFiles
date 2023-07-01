@@ -89,10 +89,10 @@ const UserTabScreen = ({ navigation }) => {
                     <Avatar bg="purple.600" alignSelf="center" size="xl" source={{
                         uri: data.profileImage
                     }}>
-                        RB
+                        !
                     </Avatar>
                     <View style={{ padding: 10, marginLeft: 20, justifyContent: 'center', }} >
-                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "blue" }} >{data ? data.firstName + " " + data.lastName : 'Your Name'}</Text>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "blue" }} >{data.firstName ? data.firstName + " " + data.lastName : 'Incomplete profile!'}</Text>
                         <View style={{
                             flexDirection: 'row',
                             flexWrap: 'wrap',

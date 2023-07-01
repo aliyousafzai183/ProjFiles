@@ -37,24 +37,24 @@ const ViewSellers = ({ route, navigation }) => {
     const calculateRatings = (sellerId) => {
         let totalRating = 0;
         ratings.map((item) => {
-            if (ratings.bidderId === sellerId) {
+            if (item.bidderId === sellerId) {
                 totalRating += item.ratings;
             }
         })
         const finalTotal = totalRating / ratings.length;
-        return finalTotal;
+        return finalTotal.toFixed(1);
     }
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.userItem}
-            onPress={() => navigation.navigate('Seller Profile', { userId: item.email })}
+            onPress={() => navigation.navigate('Seller Profile', { userId: item.email, id: item.id })}
         >
             <Text style={styles.userName}>{`${item.firstName} ${item.lastName}`}</Text>
             <Text style={styles.userContact}>Email: {item.email}</Text>
             <Text style={styles.userContact}>Mobile : {item.contact}</Text>
             <Text style={styles.userCountry}>From : {item.address + ", " + item.country}</Text>
-            <Text style={styles.userContact}>Ratings : {calculateRatings(item.userId) ? calculateRatings(item.userId) + " / 5" : "New Seller"}</Text>
+            <Text style={styles.userContact}>Ratings : {calculateRatings(item.id) ? calculateRatings(item.id) + " / 5" : "New Seller"}</Text>
         </TouchableOpacity>
     );
 

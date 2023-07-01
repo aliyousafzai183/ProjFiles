@@ -46,10 +46,17 @@ export const addNotification = async (userId, title, description, type) => {
 export const getUnreadNotifications = async (userId, lastReceivedTimestamp, callback) => {
   try {
     getNotifications(userId, (allNotifications) => {
-      
-      const unreadNotifications = allNotifications.filter(notification =>
-        notification.createdAt.seconds > lastReceivedTimestamp
-        );
+
+      const unreadNotifications = allNotifications?.filter(notification =>
+        notification.createdAt && notification.createdAt.seconds > lastReceivedTimestamp
+      );
+
+      allNotifications?.map((item) => {
+        if (item.createdAt.seconds > lastReceivedTimestamp) {
+          console.log("My Sent Timestamp", lastReceivedTimestamp);
+          console.log(item.createdAt.seconds);
+        }
+      })
       callback(unreadNotifications);
     });
   } catch (error) {

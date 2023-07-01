@@ -32,15 +32,15 @@ const ProfileScreen = ({ route }) => {
         }
     };
 
-    const calculateRatings = () => {
+    const calculateRatings = (id) => {
         let totalRating = 0;
         ratings.map((item) => {
-            if (item.bidderId === route.params.userId) {
+            if (item.bidderId === id) {
                 totalRating += item.ratings;
             }
         })
         const finalTotal = totalRating / ratings.length;
-        return finalTotal;
+        return finalTotal.toFixed(1);
     }
 
     useEffect(() => {
@@ -115,7 +115,7 @@ const ProfileScreen = ({ route }) => {
                 </View>
                 <View style={styles.section1}>
                     <Text style={styles.label}>Ratings</Text>
-                    <Text style={styles.label}>{calculateRatings() ? calculateRatings(route.params.userId) + " / 5" : "New Seller"}</Text>
+                    <Text style={styles.label}>{calculateRatings(route.params.id) ? calculateRatings(route.params.id) + " / 5" : "New Seller"}</Text>
                 </View>
 
             </View>
@@ -127,10 +127,10 @@ const ProfileScreen = ({ route }) => {
                 <View style={styles.section1}>
                     <Text style={styles.label}>Order Rate</Text>
                     {
-                        jobs ? 
-                        <Text style={styles.label}>Pkr: {formatEarnings(earnings)/jobs}</Text>
-                        :
-                        <Text style={styles.label}>Pkr: 0</Text>
+                        jobs ?
+                            <Text style={styles.label}>Pkr: {formatEarnings(earnings) / jobs}</Text>
+                            :
+                            <Text style={styles.label}>Pkr: 0</Text>
                     }
                 </View>
 
