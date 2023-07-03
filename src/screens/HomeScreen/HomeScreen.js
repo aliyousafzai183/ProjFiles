@@ -128,17 +128,6 @@ const HomeScreen = ({ navigation }) => {
   //   }
   // };
 
-  // Retrieve the last received notification timestamp
-  const getLastReceivedTimestamp = async () => {
-    try {
-      const timestamp = await AsyncStorage.getItem('lastReceivedTimestamp2');
-      return timestamp;
-    } catch (error) {
-      console.log('Error retrieving last received timestamp:', error);
-      return null;
-    }
-  };
-
   const showNotification = async (title, body) => {
     await Notifications.scheduleNotificationAsync({
       content: {
@@ -152,21 +141,12 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchUnreadNotifications = async () => {
       await getUserId().then((userId) => {
-        getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
 
-          getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
-            newNotifications.forEach(async (element) => {
-              // console.log(element);
-              showNotification(element.title, element.limitedDescription);
-              await AsyncStorage.setItem('lastReceivedTimestamp2', element.createdAt.seconds.toString());
-            });
-            // if (newNotifications.length > 0) {
-            //   const latestTimestamp = newNotifications[newNotifications.length-1].createdAt.seconds;
-            //   storeLastReceivedTimestamp(latestTimestamp.toString());
-            // }
-            // });
+        getUnreadNotifications(userId, (newNotifications) => {
+          newNotifications.forEach((element) => {
+            showNotification(element.title, element.limitedDescription);
           });
-        })
+        });
       }).catch((error) => {
         console.log('Error retrieving userId:', error);
       });

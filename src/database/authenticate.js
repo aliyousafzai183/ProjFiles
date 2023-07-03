@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification } from 'firebase/auth';
 import { ToastAndroid } from 'react-native';
 import { app, db } from './config';
-import { doc, setDoc, getDoc, onSnapshot, collection, where, query } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot, collection, where, query, updateDoc } from 'firebase/firestore';
 
 const auth = getAuth();
 
@@ -14,7 +14,8 @@ export const Signup = async (email, password, userRole) => {
     await AsyncStorage.setItem('userId', userId);
 
     await setDoc(doc(db, 'users', userId), {
-      role: userRole
+      role: userRole,
+      email: email
     });
 
     await sendEmailVerification(user);
@@ -87,27 +88,28 @@ export const Signin = async (email, password, callback) => {
   }
 };
 
-export const createUser = async (id, firstName, lastName, contact, email, about, address, cnic, country, role, skills, cat, profileImage) => {
+export const createUser = async (id, firstName, lastName, contact, about, address, cnic, country, role, skills, cat, profileImage) => {
   try {
-    await setDoc(doc(db, 'users', id), {
+    const userRef = doc(db, 'users', id);
+    await updateDoc(userRef, {
       firstName: firstName,
       lastName: lastName,
       contact: contact,
-      email: email,
       about: about,
       address: address,
       cnic: cnic,
       country: country,
-      role: role,
+      // role: role, // Commented out since you don't want to update this field
       skills: skills,
       category: cat,
       profileImage: profileImage
     });
-    console.log('User Created');
+    console.log('User updated successfully');
   } catch (error) {
     console.log(error);
   }
 };
+
 
 export const getUserDataById = (userId, callback) => {
   const userCollectionRef = collection(db, 'users');

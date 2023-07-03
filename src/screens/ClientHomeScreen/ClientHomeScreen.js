@@ -35,7 +35,7 @@ const ClientHomeScreen = ({ navigation }) => {
           getUserData(userId, (userData) => {
             if (userData.firstName !== undefined) {
               setIsProfileCompleted(true);
-            }else{
+            } else {
               setIsProfileCompleted(false);
             }
           });
@@ -65,17 +65,6 @@ const ClientHomeScreen = ({ navigation }) => {
   //   }
   // };
 
-  // Retrieve the last received notification timestamp
-  const getLastReceivedTimestamp = async () => {
-    try {
-      const timestamp = await AsyncStorage.getItem('lastReceivedTimestamp1');
-      return timestamp;
-    } catch (error) {
-      console.log('Error retrieving last received timestamp:', error);
-      return null;
-    }
-  };
-
   const getUserId = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
@@ -101,21 +90,12 @@ const ClientHomeScreen = ({ navigation }) => {
 
     const fetchUnreadNotifications = async () => {
       await getUserId().then((userId) => {
-        getLastReceivedTimestamp().then((lastReceivedTimestamp) => {
 
-          getUnreadNotifications(userId, lastReceivedTimestamp, (newNotifications) => {
-            newNotifications.forEach(async(element) => {
-              showNotification(element.title, element.limitedDescription);
-              await AsyncStorage.setItem('lastReceivedTimestamp2', element.createdAt.seconds.toString());
-
-            });
-            // if (newNotifications.length > 0) {
-            //   const latestTimestamp = newNotifications[newNotifications.length-1].createdAt.seconds;
-            //   storeLastReceivedTimestamp(latestTimestamp.toString());
-            // }
-            // });
+        getUnreadNotifications(userId, (newNotifications) => {
+          newNotifications.forEach((element) => {
+            showNotification(element.title, element.limitedDescription);
           });
-        })
+        });
       }).catch((error) => {
         console.log('Error retrieving userId:', error);
       });

@@ -1,5 +1,5 @@
 import { db } from './config';
-import { collection, onSnapshot, query, orderBy, serverTimestamp, addDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, serverTimestamp, addDoc, writeBatch, doc } from 'firebase/firestore';
 import * as Notifications from 'expo-notifications';
 
 export const getNotifications = (userId, callback) => {
@@ -32,7 +32,8 @@ export const addNotification = async (userId, title, description, type) => {
       title,
       limitedDescription,
       type,
-      createdAt: serverTimestamp() // Add server timestamp to the notification
+      createdAt: serverTimestamp(),
+      read: false
     };
     const newNotificationRef = await addDoc(notificationsRef, notificationData);
     const notificationId = newNotificationRef.id;
@@ -43,20 +44,19 @@ export const addNotification = async (userId, title, description, type) => {
   }
 };
 
-export const getUnreadNotifications = async (userId, lastReceivedTimestamp, callback) => {
+export const getUnreadNotifications = async (userId, callback) => {
   try {
     getNotifications(userId, (allNotifications) => {
-
       const unreadNotifications = allNotifications?.filter(notification =>
-        notification.createdAt && notification.createdAt.seconds > lastReceivedTimestamp
+        notification.read === false
       );
 
-      allNotifications?.map((item) => {
-        if (item.createdAt.seconds > lastReceivedTimestamp) {
-          console.log("My Sent Timestamp", lastReceivedTimestamp);
-          console.log(item.createdAt.seconds);
-        }
-      })
+      // Mark unread notifications as read
+      if (unreadNotifications.length > 0) {
+        const notificationIds = unreadNotifications.map(notification => notification.notificationId);
+        markNotificationsAsRead(notificationIds);
+      }
+
       callback(unreadNotifications);
     });
   } catch (error) {
@@ -64,3 +64,25 @@ export const getUnreadNotifications = async (userId, lastReceivedTimestamp, call
     callback([]);
   }
 };
+
+const markNotificationsAsRead = async (notificationIds) => {
+  try {
+    const notificationsRef = collection(db, 'notifications');
+
+    // Create a batch write for updating multiple documents
+    const batch = writeBatch(db);
+
+    // Iterate over each notification ID and update its read status
+    notificationIds.forEach(notificationId => {
+      const notificationDocRef = doc(notificationsRef, notificationId);
+      batch.update(notificationDocRef, { read: true });
+    });
+
+    // Commit the batch write
+    await batch.commit();
+  } catch (error) {
+    console.log('Error marking notifications as read:', error);
+    throw error;
+  }
+};
+

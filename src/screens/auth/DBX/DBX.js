@@ -297,7 +297,6 @@ const DBX = ({ navigation, route }) => {
         firstName,
         lastName,
         contact,
-        email,
         about,
         address,
         cnic,

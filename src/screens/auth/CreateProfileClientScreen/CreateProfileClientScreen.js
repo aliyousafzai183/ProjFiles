@@ -47,28 +47,28 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const backAction = () => {
-      Alert.alert("Confirm Exit", "Are you sure you want to exit the app?", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel"
-        },
-        { text: "Exit", onPress: () => BackHandler.exitApp() }
-      ]);
-      return true;
-    };
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     Alert.alert("Confirm Exit", "Are you sure you want to exit the app?", [
+  //       {
+  //         text: "Cancel",
+  //         onPress: () => null,
+  //         style: "cancel"
+  //       },
+  //       { text: "Exit", onPress: () => BackHandler.exitApp() }
+  //     ]);
+  //     return true;
+  //   };
 
-    if (!editing) {
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-      return () => backHandler.remove();
-    }
+  //   if (!editing) {
+  //     const backHandler = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       backAction
+  //     );
+  //     return () => backHandler.remove();
+  //   }
 
-  }, []);
+  // }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -159,7 +159,6 @@ const CreateProfileClientScreen = ({ navigation, route }) => {
         firstName,
         lastName,
         contact,
-        email,
         "nothing",
         "haha",
         '3443',

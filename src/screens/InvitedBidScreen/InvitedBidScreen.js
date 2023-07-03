@@ -59,7 +59,7 @@ const ViewBidsScreen = ({ navigation }) => {
           <Text style={styles.detailValue}>{bid.coverLetter}</Text>
           <View style={styles.detailsContainer}>
             <Text style={styles.detailLabel}>Name:</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Seller Profile', { userId: bid.sellerId })}>
+            <TouchableOpacity onPress={() => navigation.navigate('Seller Profile', { userId: bid.bidderId })}>
               <Text style={[styles.detailValue, styles.profileLink]}>{bid.name}</Text>
             </TouchableOpacity>
           </View>

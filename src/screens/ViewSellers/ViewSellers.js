@@ -41,6 +41,11 @@ const ViewSellers = ({ route, navigation }) => {
                 totalRating += item.ratings;
             }
         })
+
+        if (totalRating === 0) {
+            return false;
+        }
+        
         const finalTotal = totalRating / ratings.length;
         return finalTotal.toFixed(1);
     }
