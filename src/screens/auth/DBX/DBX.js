@@ -47,6 +47,14 @@ const DBX = ({ navigation, route }) => {
       value: "Engineer",
     },
     {
+      label: "Lawyer",
+      value: "Lawyer",
+    },
+    {
+      label: "Catering",
+      value: "Catering",
+    },
+    {
       label: "Architect",
       value: "Architect",
     },
@@ -66,6 +74,8 @@ const DBX = ({ navigation, route }) => {
         "Engineer": ["Mechanical Engineering", "Civil Engineering", "Electrical Engineering"],
         "Architect": ["Architectural Design", "Building Codes", "Blueprint Reading"],
         "Painter": ["Interior Painting", "Exterior Painting", "Color Mixing"],
+        "Lawyer": ["Litigation", "Contract Law", "Legal Research"],
+        "Catering": ["Food Preparation", "Menu Planning", "Event Management"],
       };
 
 
@@ -146,11 +156,11 @@ const DBX = ({ navigation, route }) => {
   const openAppSettings = () => {
     Linking.openSettings();
   };
-  
+
   const getLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-  
+
       if (status !== 'granted') {
         console.log('Location permission is required to proceed');
         const retry = await confirmRetry();
@@ -159,13 +169,13 @@ const DBX = ({ navigation, route }) => {
           return; // Return here to prevent further execution
         }
       }
-  
+
       const location = await Location.getCurrentPositionAsync();
       const { latitude, longitude } = location.coords;
-  
+
       // Reverse geocoding
       const addressData = await Location.reverseGeocodeAsync({ latitude, longitude });
-  
+
       if (addressData.length > 0) {
         const { city, country } = addressData[0];
         setAddress(city);
@@ -175,7 +185,7 @@ const DBX = ({ navigation, route }) => {
       console.error('Error getting location', error);
     }
   };
-  
+
   const confirmRetry = () => {
     return new Promise((resolve) => {
       Alert.alert(
