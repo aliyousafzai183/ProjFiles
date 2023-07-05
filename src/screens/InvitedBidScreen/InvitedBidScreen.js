@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getBidsForBuyer, deleteBid } from '../../database/bids';
 
 const ViewBidsScreen = ({ navigation }) => {
-  
+
   const [invites, setInvites] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
@@ -68,7 +68,7 @@ const ViewBidsScreen = ({ navigation }) => {
             <TouchableOpacity
               style={[styles.button, styles.sendButton]}
               onPress={() => {
-                navigation.navigate('Message', { jobPosterId: bid.jobPosterId, bidderId: bid.bidderId })
+                navigation.navigate('Message', { jobPosterId: bid.jobPosterId, bidderId: bid.bidderId, name: bid.jobTitle })
               }}
             >
               <Text style={styles.buttonText}>Message</Text>

@@ -1,64 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getUserData } from '../../database/authenticate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const JobScreen = ({ navigation }) => {
-  const [isProfileCompleted, setIsProfileCompleted] = useState(false);
-  const [role, setRole] = useState('');
-  const [email, setEmail] = useState('');
+  const [showIndicator, setShowIndicator] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const storedRole = await AsyncStorage.getItem('role');
-        const userId = await AsyncStorage.getItem('userId');
-        const email = await AsyncStorage.getItem('email');
-        if (storedRole !== null) {
-          setRole(storedRole);
-        }
-        if (email !== null) {
-          setEmail(email);
-        }
-        if (userId !== null) {
-          getUserData(userId, (userData) => {
-            if (userData.firstName !== undefined) {
-              setIsProfileCompleted(true);
-            }
-          });
-        }
-      } catch (error) {
-        console.log('Error retrieving role or userId:', error);
+  const handlePostJob = async () => {
+    setShowIndicator(true);
+    try {
+      const role = await AsyncStorage.getItem('role');
+      const userId = await AsyncStorage.getItem('userId');
+      const email = await AsyncStorage.getItem('email');
+
+      if (userId !== null) {
+        getUserData(userId, (userData) => {
+          if (userData.firstName !== undefined) {
+            navigation.navigate('Post Job', {email: userData.email});
+            setShowIndicator(false);
+          } else {
+            setShowIndicator(false);
+            Alert.alert(
+              'Incomplete Profile!',
+              'Your profile is not completed. Please complete your profile to post a job.',
+              [
+                { text: 'Skip', onPress: () => { } },
+                {
+                  text: 'OK', onPress: () => {
+                    if (role === 'Seller') {
+                      navigation.navigate('Register Alert', { editing: true, email: email });
+                    } else if (role === 'Buyer') {
+                      navigation.navigate('Buyer Account', { editing: true, email: email });
+                    }
+                  }
+                },
+              ],
+              { cancelable: false }
+            );
+          }
+        });
       }
-    };
-
-    fetchData();
-  }, []);
-
-  const handlePostJob = () => {
-    if (!isProfileCompleted) {
-      Alert.alert(
-        'Incomplete Profile!',
-        'Your profile is not completed. Please complete your profile to post a job.',
-        [
-          { text: 'Skip', onPress: () => { } },
-          {
-            text: 'OK', onPress: () => {
-              if (role === 'Seller') {
-                navigation.navigate('Register Alert', { editing: false, email: email });
-              } else if (role === 'Buyer') {
-                navigation.navigate('Buyer Account', { editing: false, email: email });
-              }
-            }
-          },
-        ],
-        { cancelable: false }
-      );
-    } else {
-      navigation.navigate('Post Job');
+    } catch (error) {
+      console.log('Error retrieving role or userId:', error);
     }
   };
+
+  if (showIndicator) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color={"blue"} size={"large"} />
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>

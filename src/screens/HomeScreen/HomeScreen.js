@@ -32,6 +32,7 @@ const HomeScreen = ({ navigation }) => {
   const [isProfileCompleted, setIsProfileCompleted] = useState(true);
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +49,7 @@ const HomeScreen = ({ navigation }) => {
         if (userId !== null) {
           getUserData(userId, (userData) => {
             if (userData.firstName !== undefined) {
+              setName(userData.firstName + " " + userData.lastName);
               setIsProfileCompleted(true);
             } else {
               setIsProfileCompleted(false);
@@ -119,14 +121,6 @@ const HomeScreen = ({ navigation }) => {
     );
     return () => backHandler.remove();
   }, []);
-
-  // Store the last received notification timestamp
-  // const storeLastReceivedTimestamp = async (timestamp) => {
-  //   try {
-  //   } catch (error) {
-  //     console.log('Error storing last received timestamp:', error);
-  //   }
-  // };
 
   const showNotification = async (title, body) => {
     await Notifications.scheduleNotificationAsync({
@@ -276,6 +270,12 @@ const HomeScreen = ({ navigation }) => {
             </Swiper>
 
             <Box bg="#fff" alignItems="center" justifyContent="center">
+              {
+                isProfileCompleted && (
+                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>Hi <Text style={{ color: "blue" }}>{name}
+                  </Text></Text>
+                )
+              }
               <Text style={{ fontSize: 20, fontWeight: "bold" }}>Welcome to Skill<Text style={{ color: "blue" }}>Finder
               </Text>App</Text>
               {
@@ -372,13 +372,15 @@ const HomeScreen = ({ navigation }) => {
                                 jobTitle: job.title,
                                 bidId: bidIdMap[job.jobId],
                                 bidderId: bidderIdMap[job.jobId],
+                                name: name,
+                                email: email
                               });
                             } else {
                               handleBannerClick("button");
                             }
                           }}
-                          title={submittedBids.includes(bidIdMap[job.jobId]) ? "Bid Submitted" : bidButtonTextMap[job.jobId]}
-                          disabled={submittedBids.includes(bidIdMap[job.jobId])} // Disable the button if the bid has been submitted
+                          title={submittedBids.includes(bidIdMap[job.jobId]) ? "Update Bid" : bidButtonTextMap[job.jobId]}
+                          // disabled={submittedBids.includes(bidIdMap[job.jobId])} // Disable the button if the bid has been submitted
                         />
                       </HStack>
                     )}

@@ -6,8 +6,7 @@ import { postJob, getJobById, deleteJob } from '../../database/jobs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PostJobScreen = ({ navigation, route }) => {
-  const { jobId, userId } = route.params ?? {}; // Use optional chaining (??) to handle undefined route.params
-  const [email, setEmail] = useState('');
+  const { jobId, userId, email } = route.params ?? {}; // Use optional chaining (??) to handle undefined route.params
   const [salary, setSalary] = useState('');
   const [duration, setDuration] = useState('');
   const [description, setDescription] = useState('');
@@ -28,7 +27,7 @@ const PostJobScreen = ({ navigation, route }) => {
       } catch (error) {
         console.log(error);
       }
-    };
+    }; 
 
     fetchJobPosterId();
 
@@ -37,7 +36,6 @@ const PostJobScreen = ({ navigation, route }) => {
       getJobById(jobId, (jobData) => {
         setTitle(jobData.title);
         setSalary(jobData.salary);
-        setEmail(jobData.email);
         setJobPosterId(jobData.jobPosterId);
         setDuration(jobData.duration);
         setDescription(jobData.description);
@@ -70,13 +68,6 @@ const PostJobScreen = ({ navigation, route }) => {
     // Check if category is chosen
     if (!cat) {
       ToastAndroid.show('Please choose a category', ToastAndroid.SHORT);
-      return;
-    }
-
-    // Check email format
-    const emailRegex = /^\S+@\S+\.\S+$/;
-    if (!emailRegex.test(email)) {
-      ToastAndroid.show('Please enter a valid email address', ToastAndroid.SHORT);
       return;
     }
 
@@ -202,19 +193,9 @@ const PostJobScreen = ({ navigation, route }) => {
 
         <TextInput
           disabled={jobId}
-          left={<TextInput.Icon name="email" />}
-          mode="flat"
-          style={[styles.input, { marginTop: 10 }]}
-          placeholder="Your Email"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <TextInput
-          disabled={jobId}
           left={<TextInput.Icon name="currency-usd" />}
           mode="flat"
-          style={styles.input}
+          style={[styles.input, { marginTop: 10 }]}
           placeholder="Hourly Salary in Pkr"
           value={salary}
           onChangeText={setSalary}

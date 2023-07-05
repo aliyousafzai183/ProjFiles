@@ -5,10 +5,8 @@ import { getBidByJobIdAndBidderId, postBid } from '../../database/bids';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BidNowScreen = ({ navigation, route }) => {
-  const { jobId, jobPosterId, jobTitle, bidId } = route.params;
-  const [name, setname] = useState('');
+  const { jobId, jobPosterId, jobTitle, bidId, name, email } = route.params;
   const [coverLetter, setcoverLetter] = useState('');
-  const [email, setEmail] = useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [bidderId, setBidderId] = useState('');
   const [isNew, setIsNew] = useState(true);
@@ -21,9 +19,7 @@ const BidNowScreen = ({ navigation, route }) => {
         if (bidId && bidId !== null) {
           await getBidByJobIdAndBidderId(jobId, userId, (bid) => {
             setIsNew(false);
-            setname(bid.name);
             setcoverLetter(bid.coverLetter);
-            setEmail(bid.email);
             setBidAmount(bid.bidAmount);
           });
         }
@@ -40,10 +36,10 @@ const BidNowScreen = ({ navigation, route }) => {
   const handleBidSubmit = async () => {
     try {
       // Check name length
-      if (name.length < 3) {
-        ToastAndroid.show('Name must be at least 3 characters long', ToastAndroid.SHORT);
-        return;
-      }
+      // if (name.length < 3) {
+      //   ToastAndroid.show('Name must be at least 3 characters long', ToastAndroid.SHORT);
+      //   return;
+      // }
 
       // Check cover letter length
       if (coverLetter.length < 10) {
@@ -52,11 +48,11 @@ const BidNowScreen = ({ navigation, route }) => {
       }
   
       // Check email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        ToastAndroid.show('Please enter a valid email address', ToastAndroid.SHORT);
-        return;
-      }
+      // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // if (!emailRegex.test(email)) {
+      //   ToastAndroid.show('Please enter a valid email address', ToastAndroid.SHORT);
+      //   return;
+      // }
 
       if (!bidAmount || isNaN(Number(bidAmount)) || Number(bidAmount) <= 0) {
         ToastAndroid.show('Please include a valid bid amount or remove any extra characters', ToastAndroid.SHORT);
@@ -101,7 +97,7 @@ const BidNowScreen = ({ navigation, route }) => {
       <Text style={styles.title}>Place Your Bid</Text>
 
       <View style={styles.form}>
-        <TextInput
+        {/* <TextInput
           left={<TextInput.Icon name="account-tie" />}
           mode="flat"
           style={styles.input}
@@ -109,7 +105,7 @@ const BidNowScreen = ({ navigation, route }) => {
           value={name}
           onChangeText={setname}
           activeUnderlineColor="yellow"
-        />
+        /> */}
 
         <TextInput
           left={<TextInput.Icon name="card-account-mail" />}
@@ -123,14 +119,14 @@ const BidNowScreen = ({ navigation, route }) => {
           activeUnderlineColor="yellow"
         />
 
-        <TextInput
+        {/* <TextInput
           left={<TextInput.Icon name="email" />}
           mode="flat"
           style={styles.input}
           placeholder="Your Email"
           value={email}
           onChangeText={setEmail}
-        />
+        /> */}
 
         <TextInput
           left={<TextInput.Icon name="currency-usd" />}

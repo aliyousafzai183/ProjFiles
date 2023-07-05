@@ -3,7 +3,7 @@ import { View, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicato
 import { Text, NativeBaseProvider, Box, Center, Container, Heading, VStack, HStack } from "native-base";
 import Swiper from 'react-native-swiper';
 import * as Notifications from 'expo-notifications';
-import { getUnreadNotifications, getNotifications } from '../../database/notifications';
+import { getUnreadNotifications } from '../../database/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LogBox } from 'react-native';
 import { getUserData } from '../../database/authenticate';
@@ -18,6 +18,7 @@ const ClientHomeScreen = ({ navigation }) => {
   const [isProfileCompleted, setIsProfileCompleted] = useState(true);
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +36,7 @@ const ClientHomeScreen = ({ navigation }) => {
           getUserData(userId, (userData) => {
             if (userData.firstName !== undefined) {
               setIsProfileCompleted(true);
+              setName(userData.firstName + ' ' + userData.lastName);
             } else {
               setIsProfileCompleted(false);
             }
@@ -55,15 +57,6 @@ const ClientHomeScreen = ({ navigation }) => {
       navigation.navigate('Buyer Account', { editing: true, email: email });
     }
   };
-
-  // Store the last received notification timestamp
-  // const storeLastReceivedTimestamp = async (timestamp) => {
-  //   try {
-  //     await AsyncStorage.setItem('lastReceivedTimestamp1', timestamp);
-  //   } catch (error) {
-  //     console.log('Error storing last received timestamp:', error);
-  //   }
-  // };
 
   const getUserId = async () => {
     try {
@@ -180,7 +173,16 @@ const ClientHomeScreen = ({ navigation }) => {
                     )
                   }
                   <Container style={{ paddingTop: 20 }}>
-                    <Heading>
+                    {
+                      isProfileCompleted && (
+                        <Heading>
+                          Hi
+                          <Text color="emerald.500"> {name} </Text>
+                          !
+                        </Heading>
+                      )
+                    }
+                    < Heading >
                       What are
                       <Text color="emerald.500"> You</Text> Looking for ?
                     </Heading>
@@ -258,7 +260,7 @@ const ClientHomeScreen = ({ navigation }) => {
             </View>
           </ScrollView>
       }
-    </View>
+    </View >
   )
 }
 

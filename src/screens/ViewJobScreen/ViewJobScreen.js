@@ -48,7 +48,7 @@ const ViewJobScreen = ({ route, navigation }) => {
   }, []);
 
   const handleMessaging = () => {
-    navigation.navigate('Message', { jobPosterId: bidData.jobPosterId, bidderId: bidData.bidderId })
+    navigation.navigate('Message', { jobPosterId: bidData.jobPosterId, bidderId: bidData.bidderId,name: bidData.name })
   };
 
   const handleAcceptInvite = async () => {

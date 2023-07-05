@@ -15,7 +15,13 @@ const NotificationScreen = () => {
         const userId = await AsyncStorage.getItem('userId');
         if (userId !== null) {
           getNotifications(userId, async (notifications) => {
-            setNotifications(notifications);
+            const data = [];
+            notifications.map((item) => {
+              if (item.type !== 'message') {
+                data.push(item);
+              }
+            })
+            setNotifications(data);
             setShowIndicator(false);
           });
         }

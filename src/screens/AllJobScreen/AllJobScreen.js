@@ -57,9 +57,10 @@ const AllJobScreen = ({ navigation }) => {
                 <TouchableOpacity
                     style={styles.bidContainer}
                     key={jobs.jobId}
-                    onPress={()=>{navigation.navigate('Post Job', {userId: jobs.jobPosterId, jobId: jobs.jobId})}}
+                    onPress={() => { navigation.navigate('Post Job', { userId: jobs.jobPosterId, jobId: jobs.jobId }) }}
                 >
-                    <Text style={styles.jobTitle}>Job Id {index+1}</Text>
+                    <Text style={styles.detailValue}>Job Id {index + 1}</Text>
+                    <Text style={styles.jobTitle}>{jobs.title}</Text>
                     <Text style={styles.price}>{jobs.salary} Pkr/hour</Text>
                     <Text style={styles.detailValue}>{jobs.description}</Text>
                     <Text style={styles.detailValue}>{jobs.email}</Text>
@@ -72,7 +73,7 @@ const AllJobScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
-                
+
             ))}
         </ScrollView>
     );

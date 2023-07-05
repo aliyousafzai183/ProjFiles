@@ -8,7 +8,7 @@ const MessageScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState('');
   const [role, setRole] = useState('Seller');
-  const { jobPosterId, bidderId } = route.params;
+  const { jobPosterId, bidderId, title, name } = route.params;
   const flatListRef = useRef(null);
   useEffect(() => {
     const unsubscribe = receiveMessage(jobPosterId, bidderId, (messageList) => {
@@ -40,7 +40,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   const handleSendMessage = () => {
     if (messageInput) {
-      sendMessage(jobPosterId, bidderId, messageInput, role);
+      sendMessage(jobPosterId, bidderId, messageInput, role, name);
       setMessageInput('');
       setTimeout(() => {
         if (flatListRef.current) {

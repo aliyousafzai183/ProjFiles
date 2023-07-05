@@ -2,8 +2,9 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import { addDoc, collection, onSnapshot, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from './config';
+import { addNotification } from './notifications';
 
-export const sendMessage = async (jobPosterId, bidderId, message, role) => {
+export const sendMessage = async (jobPosterId, bidderId, message, role, name) => {
   try {
     const newMessageRef = await addDoc(collection(db, 'messages'), {
       jobPosterId,
@@ -12,7 +13,16 @@ export const sendMessage = async (jobPosterId, bidderId, message, role) => {
       role,
       timestamp: serverTimestamp() // Use server timestamp instead of currentDate
     });
-    console.log('Message sent successfully');
+
+    try {
+      if (role === "Seller") {
+        await addNotification(jobPosterId, "You received a message from " + name + " !", message, "message");
+      } else {
+        await addNotification(bidderId, "A new message from " + name + " job !", message, "message");
+      }
+    } catch (error) {
+      console.log('Error adding notification:', error);
+    }
   } catch (error) {
     console.log('Error sending message:', error);
   }

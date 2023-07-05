@@ -27,8 +27,8 @@ const Completedorders = ({ navigation }) => {
     fetchBids();
   }, [orders]);
 
-  const handleSendMessage = (jobPosterId, bidderId) => {
-    navigation.navigate('Message', {jobPosterId: jobPosterId, bidderId: bidderId })
+  const handleSendMessage = (jobPosterId, bidderId, name) => {
+    navigation.navigate('Message', {jobPosterId: jobPosterId, bidderId: bidderId, name: name })
   };
 
   if (isLoading) {
@@ -68,7 +68,7 @@ const Completedorders = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.sendButton]}
-              onPress={() => { handleSendMessage(bid.jobPosterId, bid.bidderId) }}
+              onPress={() => { handleSendMessage(bid.jobPosterId, bid.bidderId, bid.jobTitle ) }}
             >
               <Text style={styles.buttonText}>Message</Text>
             </TouchableOpacity>
