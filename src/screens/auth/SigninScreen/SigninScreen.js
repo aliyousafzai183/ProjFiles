@@ -36,15 +36,15 @@ const SigninScreen = ({ navigation }) => {
         await AsyncStorage.setItem("email", email);
         // Sign in with email and password
         await Signin(email, password, async (data, error) => {
-          if (error === "(auth/wrong-password).") {
+          if (error && error === "(auth/wrong-password).") {
             setPassword('');
             ToastAndroid.show("Incorrect Password!", ToastAndroid.LONG);
             return;
-          } else if (error === "(auth/user-not-found).") {
+          } else if (error && error === "(auth/user-not-found).") {
             setEmail('');
             ToastAndroid.show("Email is not registered! Try Signing Up!", ToastAndroid.LONG);
             return;
-          } else {
+          } else if (error) {
             ToastAndroid.show(error, ToastAndroid.LONG);
           }
 
