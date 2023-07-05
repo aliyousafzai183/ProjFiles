@@ -254,6 +254,21 @@ const ClientHomeScreen = ({ navigation }) => {
                         style={{ width: 50, height: 50, padding: 40, marginLeft: 30 }}
                       /><Text style={{ fontWeight: "bold", textAlign: "center" }}>Mechanic</Text></TouchableOpacity>
                   </HStack>
+                  <HStack>
+                    <TouchableOpacity
+                      onPress={() => handleSearch('Lawyer')}
+                      style={{ height: 140, width: 140, margin: 10, display: "flex", justifyContent: "center", alignContent: "center", backgroundColor: "#DDDDDD", borderRadius: 10 }} ><Image
+                        source={require('../../images/carpenter.png')}
+                        style={{ width: 50, height: 50, padding: 40, marginLeft: 30 }}
+                      /><Text style={{ fontWeight: "bold", textAlign: "center" }}>Lawyer</Text></TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleSearch('Catering')}
+
+                      style={{ height: 140, width: 140, margin: 10, display: "flex", justifyContent: "center", alignContent: "center", backgroundColor: "#DDDDDD", borderRadius: 10 }} ><Image
+                        source={require('../../images/mechanic.png')}
+                        style={{ width: 50, height: 50, padding: 40, marginLeft: 30 }}
+                      /><Text style={{ fontWeight: "bold", textAlign: "center" }}>Catering</Text></TouchableOpacity>
+                  </HStack>
                 </VStack>
 
               </View>

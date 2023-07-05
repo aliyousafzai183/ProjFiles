@@ -110,6 +110,14 @@ const PostJobScreen = ({ navigation, route }) => {
       value: "Software Developer",
     },
     {
+      label: "Lawyer",
+      value: "Lawyer",
+    },
+    {
+      label: "Catering",
+      value: "Catering",
+    },
+    {
       label: "Plumber",
       value: "Plumber",
     },
