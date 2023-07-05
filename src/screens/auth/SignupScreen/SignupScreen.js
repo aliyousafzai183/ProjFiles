@@ -29,7 +29,7 @@ const SignupScreen = ({ navigation, route }) => {
       setLoading(true);
 
       try {
-        const userId = await Signup(email, password, role);
+        const userId = await Signup(email, password, role, setEmail, setPassword, setPasswordRepeat);
         if (userId && isClient) {
           AsyncStorage.setItem('role', 'Buyer');
           navigation.navigate('Buyer Account', { editing: false, email: email });
@@ -37,11 +37,9 @@ const SignupScreen = ({ navigation, route }) => {
           AsyncStorage.setItem('role', 'Seller');
           navigation.navigate('Register Alert', { editing: false, email: email });
         } else {
-          console.log('Sign-in failed');
+          // console.log('Sign-in failed');
         }
-        setPasswordRepeat('');
-        setPassword('');
-        setEmail('');
+
       } catch (error) {
         console.log(error);
         // Handle error in case signup fails

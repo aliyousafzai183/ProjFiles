@@ -1,12 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification} from 'firebase/auth';
 import { ToastAndroid } from 'react-native';
 import { app, db } from './config';
 import { doc, setDoc, getDoc, onSnapshot, collection, where, query, updateDoc } from 'firebase/firestore';
 
 const auth = getAuth();
 
-export const Signup = async (email, password, userRole) => {
+export const Signup = async (email, password, userRole, setEmail, setPassword, setPasswordRepeat) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -24,7 +24,16 @@ export const Signup = async (email, password, userRole) => {
     return userId;
   } catch (error) {
     const errorMessage = error.message;
-    ToastAndroid.show(errorMessage, ToastAndroid.LONG);
+    if (errorMessage === "Firebase: Error (auth/email-already-in-use).") {
+      ToastAndroid.show("Email is already registered with SKillFinder!", ToastAndroid.LONG);
+      setEmail('');
+    } else if (errorMessage === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
+      ToastAndroid.show("Password should be at least 6 characters!", ToastAndroid.LONG);
+      setPassword('');
+      setPasswordRepeat('');
+    } else {
+      ToastAndroid.show(errorMessage, ToastAndroid.LONG);
+    }
     return null;
   }
 };
@@ -83,7 +92,7 @@ export const Signin = async (email, password, callback) => {
     }
   } catch (error) {
     const errorMessage = error.message.slice(16, 50);
-    ToastAndroid.show(errorMessage, ToastAndroid.LONG);
+    // ToastAndroid.show(errorMessage, ToastAndroid.LONG);
     callback(null, errorMessage);
   }
 };

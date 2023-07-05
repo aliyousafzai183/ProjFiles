@@ -86,11 +86,16 @@ const UserTabScreen = ({ navigation }) => {
         <ScrollView>
             <VStack>
                 <HStack style={{ padding: 10, margin: 10 }} >
-                    <Avatar bg="purple.600" alignSelf="center" size="xl" source={{
-                        uri: data.profileImage
-                    }}>
+                    <Avatar
+                        bg="purple.600"
+                        alignSelf="center"
+                        size="xl"
+                        source={data.profileImage ? { uri: data.profileImage } : require('../../images/profile.jpg')}
+                    >
                         !
                     </Avatar>
+
+
                     <View style={{ padding: 10, marginLeft: 20, justifyContent: 'center', }} >
                         <Text style={{ fontSize: 20, fontWeight: "bold", color: "blue" }} >{data.firstName ? data.firstName + " " + data.lastName : 'Incomplete profile!'}</Text>
                         <View style={{

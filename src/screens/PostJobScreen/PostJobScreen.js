@@ -149,7 +149,7 @@ const PostJobScreen = ({ navigation, route }) => {
           mode="flat"
           style={styles.input}
           label="Enter the title of your job"
-          activeUnderlineColor="yellow"
+          activeUnderlineColor="black"
           value={title}
           onChangeText={setTitle}
           disabled={jobId}
@@ -160,7 +160,7 @@ const PostJobScreen = ({ navigation, route }) => {
           mode="flat"
           style={styles.height}
           label="Enter the description"
-          activeUnderlineColor="yellow"
+          activeUnderlineColor="black"
           multiline
           value={description}
           onChangeText={setDescription}
@@ -200,6 +200,7 @@ const PostJobScreen = ({ navigation, route }) => {
           value={salary}
           onChangeText={setSalary}
           keyboardType='numeric'
+          activeUnderlineColor="black"
         />
 
         <TextInput
@@ -210,6 +211,8 @@ const PostJobScreen = ({ navigation, route }) => {
           placeholder="Contract Duration"
           value={duration}
           onChangeText={setDuration}
+          activeUnderlineColor="black"
+
         />
 
         {

@@ -36,9 +36,16 @@ const SigninScreen = ({ navigation }) => {
         await AsyncStorage.setItem("email", email);
         // Sign in with email and password
         await Signin(email, password, async (data, error) => {
-          if (error) {
-            console.log(error);
+          if (error === "(auth/wrong-password).") {
+            setPassword('');
+            ToastAndroid.show("Incorrect Password!", ToastAndroid.LONG);
             return;
+          } else if (error === "(auth/user-not-found).") {
+            setEmail('');
+            ToastAndroid.show("Email is not registered! Try Signing Up!", ToastAndroid.LONG);
+            return;
+          } else {
+            ToastAndroid.show(error, ToastAndroid.LONG);
           }
 
           const { userRole, isProfileCompleted } = await data;
@@ -48,14 +55,14 @@ const SigninScreen = ({ navigation }) => {
             if (isEmailVerified) {
               if (userRole === 'Buyer') {
                 // if (isProfileCompleted) {
-                  setEmail('');
-                  setPassword('');
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: 'Welcome Customer' }],
-                    })
-                  );
+                setEmail('');
+                setPassword('');
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Welcome Customer' }],
+                  })
+                );
                 // } else {
                 //   ToastAndroid.show(
                 //     'Complete your profile and sign in',
@@ -65,14 +72,14 @@ const SigninScreen = ({ navigation }) => {
                 // }
               } else if (userRole === 'Seller') {
                 // if (isProfileCompleted) {
-                  setEmail('');
-                  setPassword('');
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: 'Skill Finder' }],
-                    })
-                  );
+                setEmail('');
+                setPassword('');
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Skill Finder' }],
+                  })
+                );
                 // } else {
                 //   ToastAndroid.show(
                 //     'Complete your profile and sign in',
@@ -95,11 +102,11 @@ const SigninScreen = ({ navigation }) => {
       } else {
         ToastAndroid.show('Provide Credentials Please', ToastAndroid.LONG);
       }
-      
+
     } catch (error) {
       console.log(error);
       setShowIndicator(false); // Hide the activity indicator in case of an error
-    } finally{
+    } finally {
       setShowIndicator(false); // Hide the activity indicator
 
     }

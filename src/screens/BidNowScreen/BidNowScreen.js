@@ -46,7 +46,7 @@ const BidNowScreen = ({ navigation, route }) => {
         ToastAndroid.show('Cover letter must be at least 10 characters long', ToastAndroid.SHORT);
         return;
       }
-  
+
       // Check email format
       // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       // if (!emailRegex.test(email)) {
@@ -57,8 +57,8 @@ const BidNowScreen = ({ navigation, route }) => {
       if (!bidAmount || isNaN(Number(bidAmount)) || Number(bidAmount) <= 0) {
         ToastAndroid.show('Please include a valid bid amount or remove any extra characters', ToastAndroid.SHORT);
         return;
-      } 
-  
+      }
+
       setIsLoading(true);
       await postBid(
         bidId,
@@ -82,7 +82,7 @@ const BidNowScreen = ({ navigation, route }) => {
       console.log('Error submitting bid:', error);
     }
   };
-  
+
 
   if (isLoading) {
     return (
@@ -95,18 +95,10 @@ const BidNowScreen = ({ navigation, route }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Place Your Bid</Text>
+      <Text style={styles.subTitle}>{name}</Text>
+      <Text style={styles.subTitle}>{email}</Text>
 
       <View style={styles.form}>
-        {/* <TextInput
-          left={<TextInput.Icon name="account-tie" />}
-          mode="flat"
-          style={styles.input}
-          label="Name"
-          value={name}
-          onChangeText={setname}
-          activeUnderlineColor="yellow"
-        /> */}
-
         <TextInput
           left={<TextInput.Icon name="card-account-mail" />}
           mode="flat"
@@ -116,17 +108,8 @@ const BidNowScreen = ({ navigation, route }) => {
           numberOfLines={6}
           value={coverLetter}
           onChangeText={setcoverLetter}
-          activeUnderlineColor="yellow"
+          activeUnderlineColor="black"
         />
-
-        {/* <TextInput
-          left={<TextInput.Icon name="email" />}
-          mode="flat"
-          style={styles.input}
-          placeholder="Your Email"
-          value={email}
-          onChangeText={setEmail}
-        /> */}
 
         <TextInput
           left={<TextInput.Icon name="currency-usd" />}
@@ -136,6 +119,7 @@ const BidNowScreen = ({ navigation, route }) => {
           value={bidAmount}
           onChangeText={setBidAmount}
           keyboardType='numeric'
+          activeUnderlineColor="black"
         />
 
         <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
@@ -150,12 +134,16 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop:'10%',
-    paddingBottom:'10%'
+    paddingTop: '10%',
+    paddingBottom: '10%'
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  subTitle: {
+    fontSize: 18,
     marginBottom: 20,
   },
   form: {
