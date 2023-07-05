@@ -4,6 +4,8 @@ import { Avatar, HStack, VStack } from 'native-base'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserData } from '../../database/authenticate';
 import { CommonActions } from '@react-navigation/native';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();
 
 const UserTabScreen = ({ navigation }) => {
     const [role, setRole] = useState('');
